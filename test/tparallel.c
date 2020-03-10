@@ -17,18 +17,17 @@ int foo() {
     x++; 
     first += x;
     }
-
+    printf("Thread finished second parallel\n");
     #pragma omp parallel private(i) shared(first) reduction(+:second) 
     {
-    second = first;
-    for (i = 0; i < 16; i++)
-        second++;
+	second = first;
+	for (i = 0; i < 16; i++) second++;
     }
-
     omp_set_num_threads(6);
+    printf("Thread finished third parallel.\n");
     #pragma omp parallel
     printf("Thread %d finished the execution of foo\n", omp_get_thread_num());
-
+    printf("All finished\n");
     return(x);
 }
 

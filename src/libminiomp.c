@@ -12,9 +12,9 @@ void init_miniomp(void) {
 	printf ("mini-omp is being initialized\n");
 // Parse OMP_NUM_THREADS environment variable to initialize nthreads_var internal control variable
 	parse_env();
-	// Initialize Pthread data structures 
+	// Initialize Pthread data structures
 	miniomp_threads = malloc(MAX_THREADS * sizeof(pthread_t));
-	miniomp_parallel = malloc(MAX_THREADS * sizeof(miniomp_parallel));
+	miniomp_parallel = malloc(MAX_THREADS * sizeof(miniomp_parallel_t));
 	// Initialize Pthread thread-specific data, now just used to store the OpenMP thread identifier
 	pthread_key_create(&miniomp_specifickey, NULL);
 	pthread_setspecific(miniomp_specifickey, (void *) 0); // implicit initial pthread with id=0
@@ -26,9 +26,10 @@ void init_miniomp(void) {
 }
 
 void fini_miniomp(void) {
-  // delete Pthread thread-specific data
-  pthread_key_delete(miniomp_specifickey);
+	// delete Pthread thread-specific data
+	pthread_key_delete(miniomp_specifickey);
 
-  // free other data structures allocated during library initialization
-  printf ("mini-omp is finalized\n");
+	// free other data structures allocated during library initialization
+	printf ("mini-omp is finalized\n");
 }
+
