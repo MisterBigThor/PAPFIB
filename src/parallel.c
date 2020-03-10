@@ -44,9 +44,12 @@ void *worker(void *args) {
 		miniomp_parallel[i].fn = fn;
 		pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 	}
-	//Espera a que acabin tots els threads, recollim void pointer:
-//	void * exit;
+
+	//Espera a que acabin tots els threads.
 	for(int i = 0; i < num_threads; i++){
+		#if _DEBUG
+			printf("Waiting for all team threads to finish.\n");
+		#endif
 		pthread_join(miniomp_threads[i], NULL);
 	}
 }
