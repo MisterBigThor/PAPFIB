@@ -8,6 +8,7 @@ typedef struct {
 	void (*fn) (void *);
 	void *fn_data;
 	int id;
+	int nestedLevel;
 	// complete the definition of parallel descriptor
 } miniomp_parallel_t;
 
@@ -15,6 +16,9 @@ extern miniomp_parallel_t *miniomp_parallel;
 
 // Declaration of per-thread specific key
 extern pthread_key_t miniomp_specifickey;
+
+// Declaration of per-thread specific key for data:
+extern pthread_key_t miniomp_internalkey;
 
 // Functions implemented in this module
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags);

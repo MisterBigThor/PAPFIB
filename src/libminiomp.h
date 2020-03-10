@@ -9,7 +9,8 @@
 // Maximum number of threads to be supported by our implementation
 // To be used whenever you need to dimension thread-related structures
 #define MAX_THREADS 32
-#define _DEBUG 1
+#define _DEBUG 0
+
 // To implement memory barrier (flush)
 //void __atomic_thread_fence(int);
 #define mb() __atomic_thread_fence(3)

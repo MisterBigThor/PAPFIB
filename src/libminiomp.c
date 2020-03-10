@@ -18,6 +18,7 @@ void init_miniomp(void) {
 	// Initialize Pthread thread-specific data, now just used to store the OpenMP thread identifier
 	pthread_key_create(&miniomp_specifickey, NULL);
 	pthread_setspecific(miniomp_specifickey, (void *) 0); // implicit initial pthread with id=0
+
 	// Initialize OpenMP default lock and default barrier
 
 	// Initialize OpenMP workdescriptors for for and single 

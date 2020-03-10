@@ -19,7 +19,7 @@ void *worker(void *args) {
 	printf("PARALLEL:Thread %d in worker\n", aux->id);
 #endif
   //1) save thread-specific data
-	pthread_setspecific(miniomp_specifickey, (void *)aux->fn_data);
+	pthread_setspecific(miniomp_specifickey, (void *)aux);
   //2) invoke the per-threads instance of function encapsulating the parallel region
 	aux->fn(pthread_getspecific(miniomp_specifickey));
   //3) exit the function
@@ -34,14 +34,12 @@ void *worker(void *args) {
 	printf("Starting: a parallel region using %d threads\n", num_threads);
 	printf("Initialization of structures:\n");
 #endif
-//	miniomp_parallel = malloc(32 * sizeof(miniomp_parallel_t));
-//	pthread_key_create(&miniomp_specifickey, NULL);
-//	miniomp_threads = malloc(32 * sizeof(pthread_t));
 
 	for (int i=0; i<num_threads; i++){
 		miniomp_parallel[i].id = i;
 		miniomp_parallel[i].fn_data = data;
 		miniomp_parallel[i].fn = fn;
+//		miniomp_parallel[i].nestedLevel = n; internal variable
 		pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 	}
 
