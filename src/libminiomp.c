@@ -1,5 +1,5 @@
 #include "libminiomp.h"
-//#include "intrinsic.h"
+#include "intrinsic.h"
 
 // Library constructor and desctructor
 void init_miniomp(void) __attribute__((constructor));
