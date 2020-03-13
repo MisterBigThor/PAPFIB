@@ -5,8 +5,9 @@ OPENMP	 = -fopenmp
 CFLAGS   = -Wall -O -std=c99 -march=native -I.
 CLIBS    = -L$(MINIOMP)/lib -lminiomp
 
+
 .c-omp: 
-	$(CC) $(CFLAGS) $(OPENMP) $< -o $@ $(CLIBS) 
+	$(CC) $(CFLAGS) $(OPENMP) $< -o $@ $(CLIBS)
 
 .c-gomp: 
 	$(CC) $(CFLAGS) $(OPENMP) $< -o $@ 

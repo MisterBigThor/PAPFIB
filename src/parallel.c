@@ -1,7 +1,10 @@
 #include "libminiomp.h"
 
 /*
-
+File for implement the Parallel constructor.
+It used an array of pthreads_t, a struct to control the worker of all threads,
+and specific key to allocate per thread data.
+ToDo: nestedLevel
 */
 
 pthread_t *miniomp_threads;
@@ -42,5 +45,6 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 		#endif
 		pthread_join(miniomp_threads[i], NULL);
 	}
+
 }
 

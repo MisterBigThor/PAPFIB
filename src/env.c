@@ -8,7 +8,9 @@ miniomp_icv_t miniomp_icv;
 void parse_env(void) {
     char * env = getenv ("OMP_NUM_THREADS");
     if (env == NULL) {
+#if _DEBUG
       printf("Environment variable OMP_NUM_THREADS not defined, setting nthreads_var ICV to number of cores\n");
+#endif
       int procs = (int)sysconf( _SC_NPROCESSORS_ONLN ); // returns the number of cores in system
       if (procs < 0) 
           miniomp_icv.nthreads_var = 1; 
@@ -16,5 +18,8 @@ void parse_env(void) {
     } else {
       miniomp_icv.nthreads_var = atoi(env);
     }
+#if _DEBUG
     printf("Setting nthreads_var ICV to %d\n", miniomp_icv.nthreads_var);
+#endif
+
 }
