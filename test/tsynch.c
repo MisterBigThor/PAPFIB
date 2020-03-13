@@ -8,6 +8,7 @@ void foo() {
 #pragma omp parallel // reduction(+:result)
     {
     for (long i = 0; i < 4; i++) {
+	printf("%ld \n", i);
         if (i%2) {
             #pragma omp critical(evenhola)
             result_even++;

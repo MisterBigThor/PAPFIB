@@ -9,16 +9,16 @@ pthread_mutex_t miniomp_default_lock;
 
 //UNAMED CRITICAL SECTION:
 void GOMP_critical_start (void) {
+	printMap();
 	pthread_mutex_lock(&miniomp_default_lock);
-//  	printf("TBI: Entering an unnamed critical, don't know if anyone else is alrady in. I proceed\n");
 	#if _DEBUG
 	printf("Locking the default lock for no-name critical\n");
 	#endif
 }
 
 void GOMP_critical_end (void) {
+	printMap();
 	pthread_mutex_unlock(&miniomp_default_lock);
-//  	printf("TBI: Exiting an unnamed critical section. I can not inform anyone else, bye!\n");
 	#if _DEBUG
 	printf("Unlocking the default lock for no-name critical\n");
 	#endif
@@ -26,17 +26,15 @@ void GOMP_critical_end (void) {
 
 //NAMED CRITICAL SECTION:
 void GOMP_critical_name_start (void **pptr) {
-//	pthread_mutex_t * plock = *pptr;
-	printf("name : %p\n", pptr);
+	printMap();
+	printf("CRITICAL: Critical name start with name : %p\n", pptr);
 	lockPosition(pptr);
 }
 
 void GOMP_critical_name_end (void **pptr) {
-//	pthread_mutex_t * plock = *pptr;
-	printf("name: %p, \n", pptr);
+	printMap();
+	printf("CRITICAL: Critical name ends with name: %p \n", pptr);
 	unlockPosition(pptr);
-//	printf("TBI: Exiting a named critical %p (%p), I can not inform anyone else, bye!\n", pptr, plock);
-  	// if plock is still NULL something went wrong
 }
 
 //BARRIER:
