@@ -1,52 +1,51 @@
 #include "map.h"
 
-struct map myMutexesMap[MAX_MUTEXES];
+struct map myMutexesPointer[MAX_MUTEXES];
 int freeMutexMap;
+//struct map * myMutexesPointer;
+pthread_mutexattr_t attr;
 
 void initMap(){
 	printf("inicializacion de map de mutexes \n");
-	//freeMutexMap = 0;
-	//initialize all mutex?
+//	myMutexesPointer = malloc(sizeof(struct map) * MAX_MUTEXES);
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_setpshared(&attr,PTHREAD_PROCESS_SHARED);
 	for(int i = 0; i < MAX_MUTEXES; ++i){
-		myMutexesMap->key = NULL;
+		myMutexesPointer[i].key = NULL;
+		pthread_mutex_init(&myMutexesPointer[i].plock, &attr);
 	}
-//	freeMutexMap = MAX_MUTEXES;
+	printf("fin de inicializacion del map\n");
 }
 
 void destroyMap(){
-
-}
-
-int findKeyPosition(void ** key){
-	for(int i = 0; i<MAX_MUTEXES; ++i){
-		if(myMutexesMap->key == key) return i;
+	for(int i = 0; i < MAX_MUTEXES; ++i){
+		//pthread_mutex_destroy(&myMutexesPointer[i].plock);
 	}
-	return -1;
+	//free(myMutexesPointer);
 }
 
 void lockPosition(void ** pptr){
 	int firstFree = -1;
 	for(int i = 0; i < MAX_MUTEXES; ++i){
-		if(myMutexesMap[i].key == pptr){
-			pthread_mutex_init(&myMutexesMap[i].plock, NULL);
-			pthread_mutex_lock(&myMutexesMap[i].plock);
-			myMutexesMap[i].key = pptr;
+		if(myMutexesPointer[i].key == pptr){
+			pthread_mutex_lock(&myMutexesPointer[i].plock);
+			myMutexesPointer[i].key = pptr;
 			#if _DEBUG
 			printf("Locking key: %p", pptr );
 			#endif
 			return;
 		}
-		if(myMutexesMap[i].key == NULL) firstFree=i;
+		if((myMutexesPointer[i].key == NULL) & (firstFree == -1)) firstFree=i;
 	}
-	pthread_mutex_init(&myMutexesMap[firstFree].plock, NULL);
-	myMutexesMap[firstFree].key = pptr;
-	pthread_mutex_lock(&myMutexesMap[firstFree].plock);
+	myMutexesPointer[firstFree].key = pptr;
+	pthread_mutex_lock(&myMutexesPointer[firstFree].plock);
 }
+
 void unlockPosition(void **pptr){
 	for(int i = 0; i< MAX_MUTEXES; ++i){
-		if(myMutexesMap[i].key == pptr) {
-			pthread_mutex_unlock(&myMutexesMap[i].plock);
-			myMutexesMap[i].key = NULL;
+		if(myMutexesPointer[i].key == pptr) {
+			pthread_mutex_unlock(&myMutexesPointer[i].plock);
+			myMutexesPointer[i].key = NULL;
 			#if _DEBUG
 			printf("Unlocking key %p", pptr);
 			#endif
@@ -56,7 +55,7 @@ void unlockPosition(void **pptr){
 
 void printMap(){
 	for(int i = 0; i< MAX_MUTEXES; ++i){
-		if(myMutexesMap[i].key != NULL)
-			printf("%d: %p \n", i, myMutexesMap[i].key);
+		if(myMutexesPointer[i].key != NULL)
+			printf("%d: %p \n", i, myMutexesPointer[i].key);
 	}
 }

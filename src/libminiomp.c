@@ -39,7 +39,7 @@ void fini_miniomp(void) {
 	pthread_mutex_destroy(&miniomp_default_lock);
 	pthread_barrier_destroy(&miniomp_barrier); // free default barrier
 
-
+	destroyMap();
 
 	printf ("mini-omp is finalized\n");
 }

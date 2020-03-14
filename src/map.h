@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_MUTEXES 50
+#define MAX_MUTEXES 20
 
 
 struct map{
@@ -9,7 +10,7 @@ struct map{
 	pthread_mutex_t plock;
 };
 
-extern struct map myMutexesMap[MAX_MUTEXES];
+//extern struct map myMutexesMap[MAX_MUTEXES];
 extern int freeMutexMap;
 
 void initMap();

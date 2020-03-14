@@ -7,8 +7,7 @@ long result=0, result_even=0, result_odd=0;
 void foo() {
 #pragma omp parallel // reduction(+:result)
     {
-    for (long i = 0; i < 4; i++) {
-	printf("%ld \n", i);
+    for (long i = 0; i < 20; i++) {
         if (i%2) {
             #pragma omp critical(evenhola)
             result_even++;
