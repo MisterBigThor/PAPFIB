@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_MUTEXES 20
-
+#define MAX_MUTEXES 4
 
 struct map{
 	void * key;
