@@ -6,7 +6,7 @@
 
 
 struct map{
-	void ** key;
+	void * key;
 	pthread_mutex_t plock;
 };
 
