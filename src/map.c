@@ -1,19 +1,21 @@
 #include "map.h"
 
-struct map myMutexesPointer[MAX_MUTEXES];
+static struct map myMutexesPointer[MAX_MUTEXES];
 int freeMutexMap;
 //struct map * myMutexesPointer;
-pthread_mutexattr_t attr;
+//pthread_mutexattr_t attr;
 
 void initMap(){
 	//printf("inicializacion de map de mutexes \n");
 //	myMutexesPointer = malloc(sizeof(struct map) * MAX_MUTEXES);
-	pthread_mutexattr_init(&attr);
-	pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
-	pthread_mutexattr_setpshared(&attr,PTHREAD_PROCESS_SHARED);
+//	pthread_mutexattr_init(&attr);
+//	pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
+//	pthread_mutexattr_setpshared(&attr,PTHREAD_PROCESS_SHARED);
 	for(int i = 0; i < MAX_MUTEXES; ++i){
 		myMutexesPointer[i].key = NULL;
-		pthread_mutex_init(&myMutexesPointer[i].plock, &attr);
+		myMutexesPointer[i].plock = PTHREAD_MUTEX_INITIALIZER;
+	//	pthread_mutex_init(&myMutexesPointer[i].plock, NULL);
+
 	}
 	//printf("fin de inicializacion del map\n");
 }

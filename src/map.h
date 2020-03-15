@@ -4,13 +4,13 @@
 
 #define MAX_MUTEXES 4
 
-struct map{
+static struct map{
 	void * key;
-	pthread_mutex_t plock;
+	static pthread_mutex_t plock;
 };
 
-//extern struct map myMutexesMap[MAX_MUTEXES];
-extern int freeMutexMap;
+extern static struct map myMutexesMap[MAX_MUTEXES];
+
 
 void initMap();
 void destroyMap();
