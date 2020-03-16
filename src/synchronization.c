@@ -9,9 +9,10 @@ File for implement the barrier and the critical section (named & unnamed)
 // Default lock for critical sections
 pthread_mutex_t miniomp_default_lock;
 
-namedLock * myLockList;
+//namedLock * myLockList;
 //namedLock myNamedLocks[MAX_NAMED_LOCKS];
 
+/*
 void critical_names_init(void){
 	printf("starting names:\n");
 	myLockList = malloc(MAX_NAMED_LOCKS * sizeof(namedLock));
@@ -55,7 +56,7 @@ inline void unlockPosition(void **pptr){
 	}
 	printf("Error: unlocking a mutex not previous locked");
 }
-
+*/
 //UNAMED CRITICAL SECTION:
 void GOMP_critical_start (void) {
 	pthread_mutex_lock(&miniomp_default_lock);
@@ -74,6 +75,7 @@ void GOMP_critical_end (void) {
 //NAMED CRITICAL SECTION:
 
 void GOMP_critical_name_start (void **pptr) {
+//	lockPosition(pptr);
 	lockPosition(pptr);
 	#if _DEBUG
 	printf("CRITICAL: Critical name start with name : %p\n", pptr);
@@ -83,6 +85,7 @@ void GOMP_critical_name_start (void **pptr) {
 }
 
 void GOMP_critical_name_end (void **pptr) {
+//	unlockPosition(pptr);
 	unlockPosition(pptr);
 	#if _DEBUG
 	printf("CRITICAL: Critical name ends with name: %p \n", pptr);

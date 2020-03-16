@@ -5,7 +5,7 @@
 long result=0, result_even=0, result_odd=0;
 
 void foo() {
-#pragma omp parallel // reduction(+:result)
+#pragma omp parallel num_threads(4)// reduction(+:result)
     {
     for (long i = 0; i < 20; i++) {
         if (i%2) {

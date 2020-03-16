@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_MUTEXES 4
+#define MAX_MUTEXES 3
 
-static struct map{
+typedef struct {
 	void * key;
-	static pthread_mutex_t plock;
-};
+	pthread_mutex_t plock;
+} map;
 
-extern static struct map myMutexesMap[MAX_MUTEXES];
-
+extern map myMutexesMap[MAX_MUTEXES];
 
 void initMap();
 void destroyMap();

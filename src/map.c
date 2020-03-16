@@ -1,23 +1,24 @@
 #include "map.h"
 
-static struct map myMutexesPointer[MAX_MUTEXES];
-int freeMutexMap;
-//struct map * myMutexesPointer;
-//pthread_mutexattr_t attr;
+map myMutexesPointer[MAX_MUTEXES];
+
+///struct map * myMutexesPointer;
+pthread_mutexattr_t attr;
+
+//static pthread_mutex_t mutex[MAX_MUTEXES];
 
 void initMap(){
-	//printf("inicializacion de map de mutexes \n");
+	printf("inicializacion de map de mutexes \n");
 //	myMutexesPointer = malloc(sizeof(struct map) * MAX_MUTEXES);
-//	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_init(&attr);
 //	pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
-//	pthread_mutexattr_setpshared(&attr,PTHREAD_PROCESS_SHARED);
+	pthread_mutexattr_setpshared(&attr,PTHREAD_PROCESS_SHARED);
 	for(int i = 0; i < MAX_MUTEXES; ++i){
 		myMutexesPointer[i].key = NULL;
-		myMutexesPointer[i].plock = PTHREAD_MUTEX_INITIALIZER;
-	//	pthread_mutex_init(&myMutexesPointer[i].plock, NULL);
-
+//		myMutexesPointer[i].plock = PTHREAD_MUTEX_INITIALIZER;
+		pthread_mutex_init(&myMutexesPointer[i].plock, &attr);
 	}
-	//printf("fin de inicializacion del map\n");
+	printf("fin de inicializacion del map\n");
 }
 
 void destroyMap(){
@@ -31,8 +32,8 @@ void lockPosition(void ** pptr){
 	for(int i = 0; i < MAX_MUTEXES; ++i){
 		if(myMutexesPointer[i].key == *pptr){
 	//		printf("locking...");
-			pthread_mutex_lock(&myMutexesPointer[i].plock);
 			myMutexesPointer[i].key = pptr;
+			pthread_mutex_lock(&myMutexesPointer[i].plock);
 			#if _DEBUG
 			printf("Locking key: %p", pptr );
 			#endif
@@ -60,6 +61,7 @@ void unlockPosition(void **pptr){
 			return;
 		}
 	}
+//	printf("something went wrong\n");
 }
 
 void printMap(){

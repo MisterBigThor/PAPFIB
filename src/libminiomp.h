@@ -23,3 +23,4 @@
 #include "loop.h"
 #include "single.h"
 #include "task.h"
+#include "map.h"
