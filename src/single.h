@@ -2,8 +2,7 @@
 typedef struct {
 	bool singleActivation; 	//var for control the init.
 	int idSingleThread; 	//only for info, usefull?
-
-	// complete the definition of single descriptor
+				//id for validate 2 single sections.
 } miniomp_single_t;
 
 // Declaration of global variable for single work descriptor
