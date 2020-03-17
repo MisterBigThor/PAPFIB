@@ -1,0 +1,202 @@
+	.file	"tworkshare.c"
+	.text
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.LC0:
+	.string	"Inside foo ... result = %ld\n"
+	.text
+	.type	foo._omp_fn.0, @function
+foo._omp_fn.0:
+.LFB25:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	pushq	%rbx
+	.cfi_def_cfa_offset 24
+	.cfi_offset 3, -24
+	subq	$56, %rsp
+	.cfi_def_cfa_offset 80
+	call	omp_get_num_threads
+	movslq	%eax, %rbx
+	call	omp_get_thread_num
+	movslq	%eax, %rcx
+	movl	$10, %eax
+	cqto
+	idivq	%rbx
+	movq	%rax, %rsi
+	movq	%rdx, %rdi
+	cmpq	%rdx, %rcx
+	jl	.L2
+.L16:
+	imulq	%rsi, %rcx
+	leaq	(%rcx,%rdi), %rax
+	leaq	(%rsi,%rax), %rdx
+	cmpq	%rdx, %rax
+	jge	.L3
+.L4:
+	lock addq	$1, result(%rip)
+	addq	$1, %rax
+	cmpq	%rax, %rdx
+	jne	.L4
+.L3:
+	call	GOMP_barrier
+	leaq	8(%rsp), %r9
+	movq	%rsp, %r8
+	movl	$1, %ecx
+	movl	$1, %edx
+	movl	$10, %esi
+	movl	$0, %edi
+	call	GOMP_loop_dynamic_start
+	movl	$0, %ebx
+	testb	%al, %al
+	je	.L5
+	movl	$0, %edx
+.L7:
+	movq	(%rsp), %rsi
+	movq	8(%rsp), %rcx
+	movq	%rdx, %rbx
+.L6:
+	addq	$1, %rbx
+	leaq	(%rsi,%rbx), %rax
+	subq	%rdx, %rax
+	cmpq	%rax, %rcx
+	jg	.L6
+	leaq	8(%rsp), %rsi
+	movq	%rsp, %rdi
+	call	GOMP_loop_dynamic_next
+	movq	%rbx, %rdx
+	testb	%al, %al
+	jne	.L7
+.L5:
+	lock addq	%rbx, result(%rip)
+	call	GOMP_loop_end
+	leaq	24(%rsp), %r9
+	leaq	16(%rsp), %r8
+	movl	$1, %ecx
+	movl	$1, %edx
+	movl	$10, %esi
+	movl	$0, %edi
+	call	GOMP_loop_dynamic_start
+	testb	%al, %al
+	je	.L8
+.L10:
+	movq	16(%rsp), %rax
+	movq	24(%rsp), %rdx
+.L9:
+	lock addq	$1, result(%rip)
+	addq	$1, %rax
+	cmpq	%rax, %rdx
+	jg	.L9
+	leaq	24(%rsp), %rsi
+	leaq	16(%rsp), %rdi
+	call	GOMP_loop_dynamic_next
+	testb	%al, %al
+	jne	.L10
+.L8:
+	call	GOMP_loop_end
+	leaq	40(%rsp), %r9
+	leaq	32(%rsp), %r8
+	movl	$2, %ecx
+	movl	$1, %edx
+	movl	$10, %esi
+	movl	$0, %edi
+	call	GOMP_loop_dynamic_start
+	testb	%al, %al
+	je	.L11
+.L13:
+	movq	32(%rsp), %rbx
+	movq	40(%rsp), %rbp
+.L12:
+	call	GOMP_critical_start
+	addq	$1, result(%rip)
+	call	GOMP_critical_end
+	addq	$1, %rbx
+	cmpq	%rbx, %rbp
+	jg	.L12
+	leaq	40(%rsp), %rsi
+	leaq	32(%rsp), %rdi
+	call	GOMP_loop_dynamic_next
+	testb	%al, %al
+	jne	.L13
+.L11:
+	call	GOMP_loop_end_nowait
+	lock addq	$1, result(%rip)
+	call	GOMP_barrier
+	call	GOMP_single_start
+	testb	%al, %al
+	jne	.L26
+.L1:
+	addq	$56, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 24
+	popq	%rbx
+	.cfi_def_cfa_offset 16
+	popq	%rbp
+	.cfi_def_cfa_offset 8
+	ret
+.L26:
+	.cfi_restore_state
+	movq	result(%rip), %rsi
+	movl	$.LC0, %edi
+	movl	$0, %eax
+	call	printf
+	jmp	.L1
+.L2:
+	leaq	1(%rax), %rsi
+	movl	$0, %edi
+	jmp	.L16
+	.cfi_endproc
+.LFE25:
+	.size	foo._omp_fn.0, .-foo._omp_fn.0
+	.globl	foo
+	.type	foo, @function
+foo:
+.LFB23:
+	.cfi_startproc
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	movl	$0, %ecx
+	movl	$0, %edx
+	movl	$0, %esi
+	movl	$foo._omp_fn.0, %edi
+	call	GOMP_parallel
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE23:
+	.size	foo, .-foo
+	.section	.rodata.str1.8,"aMS",@progbits,1
+	.align 8
+.LC1:
+	.string	"Back in main ... result = %ld\n"
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB24:
+	.cfi_startproc
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	movl	$0, %eax
+	call	foo
+	movq	result(%rip), %rsi
+	movl	$.LC1, %edi
+	movl	$0, %eax
+	call	printf
+	movl	$0, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE24:
+	.size	main, .-main
+	.globl	result
+	.bss
+	.align 8
+	.type	result, @object
+	.size	result, 8
+result:
+	.zero	8
+	.ident	"GCC: (GNU) 7.3.0"
+	.section	.note.GNU-stack,"",@progbits
