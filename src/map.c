@@ -1,24 +1,25 @@
 #include "map.h"
 
-map myMutexesPointer[MAX_MUTEXES];
-
-pthread_mutexattr_t attr;
+map * myMutexesPointer;
 
 int keys; //keys used
+int size; //actual array size
 
 void initMap(){
 	#if _DEBUG
-		printf("Key-value for mutex init \n");
+		printf("Key-value for mutex init.\n");
 	#endif
+	myMutexesPointer = malloc(sizeof(map)*INIT_MUTEXES);
 	keys = 0;
-	for(int i = 0; i < MAX_MUTEXES; ++i){
+	size = INIT_MUTEXES;
+	for(int i = 0; i < INIT_MUTEXES; ++i){
 		myMutexesPointer[i].key = NULL;
 		pthread_mutex_init(&myMutexesPointer[i].plock, NULL);
 	}
 }
 
 void destroyMap(){
-	for(int i = 0; i < MAX_MUTEXES; ++i){
+	for(int i = 0; i < size; ++i){
 		pthread_mutex_destroy(&myMutexesPointer[i].plock);
 	}
 	#if _DEBUG
@@ -27,7 +28,7 @@ void destroyMap(){
 }
 
 void lockPosition(void ** pptr){
-	for(int i = 0; i < MAX_MUTEXES; ++i){
+	for(int i = 0; i < keys; ++i){
 		if(myMutexesPointer[i].key == pptr){
 			pthread_mutex_lock(&myMutexesPointer[i].plock);
 			#if _DEBUG
@@ -36,8 +37,11 @@ void lockPosition(void ** pptr){
 			return;
 		}
 	}
-	for(int i = keys - 1; i < MAX_MUTEXES; ++i){
+	for(int i = 0; i < size; ++i){
 		if(myMutexesPointer[i].key == NULL){
+			#if _DEBUG
+				printf("NEW LOCKING!");
+			#endif
 			__sync_fetch_and_add(&keys, 1);
 			myMutexesPointer[i].key = pptr;
 			pthread_mutex_lock(&myMutexesPointer[i].plock);
@@ -47,7 +51,7 @@ void lockPosition(void ** pptr){
 }
 
 void unlockPosition(void **pptr){
-	for(int i = 0; i< MAX_MUTEXES; ++i){
+	for(int i = 0; i < size; ++i){
 		if(myMutexesPointer[i].key == pptr) {
 			pthread_mutex_unlock(&myMutexesPointer[i].plock);
 			#if _DEBUG
@@ -56,6 +60,7 @@ void unlockPosition(void **pptr){
 			return;
 		}
 	}
-	printf("something went wrong\n");
+	printf("something went wrong!!!\n");
+	exit(-1);
 }
 
