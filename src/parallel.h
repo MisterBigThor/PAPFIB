@@ -8,7 +8,7 @@ typedef struct {
 	void (*fn) (void *);
 	void *fn_data;
 	int id;
-	int nestedLevel;
+//	int nestedLevel;
 	// complete the definition of parallel descriptor
 } miniomp_parallel_t;
 
