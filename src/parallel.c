@@ -25,10 +25,9 @@ void *worker(void *args) {
 
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
 	if(!num_threads) num_threads = omp_get_num_threads();
-
+	else updateNumThreads(num_threads);
 	#if _DEBUG
 		printf("Starting: a parallel region using %d threads\n", num_threads);
-		printf("Initialization of structures:\n");
 	#endif
 
 	for (int i=0; i<num_threads; i++){

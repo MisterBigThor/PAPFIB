@@ -24,3 +24,6 @@
 #include "single.h"
 #include "task.h"
 #include "map.h"
+
+
+void updateNumThreads(int numThreads);

@@ -1,4 +1,5 @@
 #include "map.h"
+#include <errno.h>
 
 map myMutexesPointer[MAX_MUTEXES];
 
@@ -30,9 +31,12 @@ void destroyMap(){
 
 void lockPosition(void ** pptr){
 	for(int i = 0; i < MAX_MUTEXES; ++i){
-		if(myMutexesPointer[i].key == *pptr){
-	//		printf("locking...");
-			myMutexesPointer[i].key = pptr;
+		if(myMutexesPointer[i].key == pptr){
+//			myMutexesPointer[i].key = pptr;
+//			while(pthread_mutex_trylock(&myMutexesPointer[i].plock) == EBUSY){
+//				printf("thread esperando al lock\n");
+//				if(pthread_mutex_trylock(&myMutexesPointer[i].plock) == 0) return;
+//			}
 			pthread_mutex_lock(&myMutexesPointer[i].plock);
 			#if _DEBUG
 			printf("Locking key: %p", pptr );
@@ -51,17 +55,18 @@ void lockPosition(void ** pptr){
 
 void unlockPosition(void **pptr){
 	for(int i = 0; i< MAX_MUTEXES; ++i){
-		if(myMutexesPointer[i].key == *pptr) {
+		if(myMutexesPointer[i].key == pptr) {
 	//		printf("unlock");
+//			myMutexesPointer[i].key = NULL;
 			pthread_mutex_unlock(&myMutexesPointer[i].plock);
-			myMutexesPointer[i].key = NULL;
+//			myMutexesPointer[i].key = NULL;
 			#if _DEBUG
 			printf("Unlocking key %p", pptr);
 			#endif
 			return;
 		}
 	}
-//	printf("something went wrong\n");
+	printf("something went wrong\n");
 }
 
 void printMap(){

@@ -78,7 +78,7 @@ void GOMP_critical_name_start (void **pptr) {
 //	lockPosition(pptr);
 	lockPosition(pptr);
 	#if _DEBUG
-	printf("CRITICAL: Critical name start with name : %p\n", pptr);
+	printf("(%u)CRITICAL_START: name : %p %s\n",omp_get_thread_num(), pptr,(char *) *pptr);
 	#endif
 
 
@@ -88,7 +88,7 @@ void GOMP_critical_name_end (void **pptr) {
 //	unlockPosition(pptr);
 	unlockPosition(pptr);
 	#if _DEBUG
-	printf("CRITICAL: Critical name ends with name: %p \n", pptr);
+	printf("(%u) CRITICAL: Critical name ends with name: %p \n", omp_get_thread_num(), pptr);
 	#endif
 }
 
@@ -97,10 +97,10 @@ pthread_barrier_t miniomp_barrier;
 
 void GOMP_barrier() {
 #if _DEBUG
-	printf("GOMP_barrier: entering barrier \n");
+	printf("(%u)GOMP_barrier: entering barrier \n", omp_get_thread_num());
 #endif
 	pthread_barrier_wait(&miniomp_barrier);
 #if _DEBUG
-	printf("GOMP_barrier: ended the barrier \n");
+	printf("(%u) GOMP_barrier: ended the barrier \n", omp_get_thread_num());
 #endif
 }

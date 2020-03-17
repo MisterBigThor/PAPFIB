@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_MUTEXES 3
+#define MAX_MUTEXES 10 
 
 typedef struct {
 	void * key;
