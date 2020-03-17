@@ -6,10 +6,10 @@ extern pthread_mutex_t miniomp_default_lock;
 // Default barrier within a parallel region
 extern pthread_barrier_t miniomp_barrier;
 
-// Named locks struct, as a list?
+//Definition of a key-value array:
+
 
 // Functions implemented in this module
-
 void GOMP_critical_start (void);
 void GOMP_critical_end (void);
 void GOMP_critical_name_start (void **pptr);
