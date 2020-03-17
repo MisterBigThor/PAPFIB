@@ -10,7 +10,7 @@
 // To be used whenever you need to dimension thread-related structures
 #define MAX_THREADS 32
 // Debug for the internal printf
-#define _DEBUG 1
+#define _DEBUG 0
 
 // To implement memory barrier (flush)
 //void __atomic_thread_fence(int);
