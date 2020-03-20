@@ -7,7 +7,7 @@ miniomp_loop_t miniomp_loop;
 
 bool GOMP_loop_dynamic_next (long *istart, long *iend) {
 	#if _DEBUG
-		printf("(%u)LOOP: more iterations\n?");
+		printf("(%u)LOOP: more iterations\n?", omp_get_thread_num());
 	#endif
 	//fill new iterations? return if still more it's.
 //	*istart = NULL;

@@ -30,7 +30,6 @@ void init_miniomp(void) {
 
 	// Initialize OpenMP workdescriptors for for and single
 	miniomp_single.singleActivation = false;		//initialize the single descritptor with a null value.
-	miniomp_single.idSingleThread = -1;
 	miniomp_loop.inicialized = false;	 		//initialize the loop descriptor with a null value.
 	// Initialize OpenMP task queue for task and taskloop
 
