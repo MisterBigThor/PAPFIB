@@ -1,3 +1,6 @@
+#ifndef _MAP_H
+#define _MAP_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -19,3 +22,4 @@ void unlockPosition(void **key);
 
 void printMap();
 
+#endif

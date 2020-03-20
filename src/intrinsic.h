@@ -1,3 +1,6 @@
+#ifndef _INTRINSICS
+#define _INTRINSICS
+
 // OpenMP intrinsics
 
 // Sets the number of threads to be used in the following parallel regions
@@ -12,3 +15,4 @@ int omp_get_thread_num (void);
 // This function returns the nesting level for the parallel region, 
 // which enclose the calling call 
 int omp_get_level (void);
+#endif

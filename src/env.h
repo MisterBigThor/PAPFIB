@@ -1,3 +1,5 @@
+#ifndef ENV_H
+#define ENV_H
 // Type declaration for Internal Control Variables (ICV) structure
 typedef struct {
 	int nthreads_var;
@@ -8,3 +10,4 @@ extern miniomp_icv_t miniomp_icv;
 
 void parse_env(void);
 
+#endif

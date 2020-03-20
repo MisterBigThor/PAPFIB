@@ -1,3 +1,6 @@
+#ifndef PARALLEL_H
+#define PARALLEL_H
+
 #include <pthread.h>
 
 // Declaration of array for storing pthread identifiers from pthread_create function
@@ -22,3 +25,5 @@ extern pthread_key_t miniomp_internalkey;
 
 // Functions implemented in this module
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags);
+
+#endif

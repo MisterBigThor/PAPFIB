@@ -8,6 +8,7 @@ miniomp_single_t miniomp_single;
 
 bool GOMP_single_start (void)
 {
+/*
 	if(__sync_bool_compare_and_swap(&miniomp_single.singleActivation, false, true)){
 		miniomp_single.idSingleThread = omp_get_thread_num();
 		#if _DEBUG
@@ -21,6 +22,8 @@ bool GOMP_single_start (void)
 		#endif
 		return(false);
 	}
+*/
+	return false;
 }
 
 

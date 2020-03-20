@@ -1,3 +1,6 @@
+#ifndef _SYNC
+#define _SYNC
+
 #include <pthread.h>
 
 // Default lock for unnamed critical sections
@@ -15,3 +18,5 @@ void GOMP_critical_end (void);
 void GOMP_critical_name_start (void **pptr);
 void GOMP_critical_name_end (void **pptr);
 void GOMP_barrier(void);
+
+#endif

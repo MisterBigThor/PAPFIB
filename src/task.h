@@ -1,3 +1,6 @@
+#ifndef _TASK
+#define _TASK
+
 /* This structure describes a "task" to be run by a thread.  */
 typedef struct {
     void (*fn)(void *);
@@ -26,3 +29,5 @@ bool is_valid(miniomp_task_t *task_descriptor);
 bool enqueue(miniomp_taskqueue_t *task_queue, miniomp_task_t *task_descriptor); 
 bool dequeue(miniomp_taskqueue_t *task_queue);
 miniomp_task_t *first(miniomp_taskqueue_t *task_queue); 
+
+#endif

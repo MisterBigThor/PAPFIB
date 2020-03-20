@@ -1,3 +1,5 @@
+#ifndef _LOOP_H
+#define _LOOP_H
 // Type declaration for loop worksharing descriptor
 typedef struct {
 	bool inicialized;    	//constructor exists.
@@ -26,3 +28,5 @@ typedef struct {
 #define ws_AUTO 	5
 
 extern miniomp_loop_t miniomp_loop;
+
+#endif

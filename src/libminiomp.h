@@ -1,3 +1,6 @@
+#ifndef _LIBMINIOMP_H
+#define _LIBMINIOMP_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -24,6 +27,7 @@
 #include "single.h"
 #include "task.h"
 #include "map.h"
-
+#include "list.h"
 
 void updateNumThreads(int numThreads);
+#endif

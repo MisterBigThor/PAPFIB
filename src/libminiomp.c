@@ -23,21 +23,22 @@ void init_miniomp(void) {
 	pthread_setspecific(miniomp_specifickey, (void *) 0); // implicit initial pthread with id=0
 
 	// Initialize OpenMP default lock and default barrier
+	#if _DEBUG
 	printf("Initialized default OMP barrier with %u \n", miniomp_icv.nthreads_var);
+	#endif
 	pthread_barrier_init(&miniomp_barrier, NULL, miniomp_icv.nthreads_var);
 	pthread_mutex_init(&miniomp_default_lock, NULL);
-	initMap(); //inint support for mutex-named critical
+	initMap();
 
 	// Initialize OpenMP workdescriptors for for and single
 	miniomp_single.singleActivation = false;		//initialize the single descritptor with a null value.
 	miniomp_loop.inicialized = false;	 		//initialize the loop descriptor with a null value.
 	// Initialize OpenMP task queue for task and taskloop
-
 }
 
 void updateNumThreads(int numThreads){
 	#if _DEBUG
-		printf("Refresh the num_threads");
+		printf("Refresh the num_threads, for the default barrier.\n");
 	#endif
 	miniomp_icv.nthreads_var = numThreads;
 	pthread_barrier_init(&miniomp_barrier, NULL, numThreads);
@@ -53,7 +54,8 @@ void fini_miniomp(void) {
 	pthread_barrier_destroy(&miniomp_barrier); // free default barrier
 
 	destroyMap();
-
+	#if _DEBUG
 	printf ("mini-omp is finalized\n");
+	#endif
 }
 

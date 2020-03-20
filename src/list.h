@@ -1,6 +1,10 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
+
+/*
+List anchor from SO2-ZEOS OS
+*/
 struct list_head {
 	struct list_head *next, *prev;
 };
