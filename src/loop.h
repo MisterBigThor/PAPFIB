@@ -1,12 +1,21 @@
 // Type declaration for loop worksharing descriptor
 typedef struct {
-  long start;           // loop bounds and increment
-  long end;
-  long incr;
+	bool inicialized;    	//constructor exists.
 
-  int schedule;         // schedule kind for loop
-  long chunk_size;
-  // complete the definition of worksharing descriptor
+ 	long start;           	// loop bounds and increment.
+ 	long end;
+  	long incr;
+  	int schedule;         	// schedule kind for loop.
+  	long chunk_size;
+
+	pthread_mutex_t mutexItDone;
+	pthread_mutex_t	mutexNextIt;
+	long itDone;	     	//its done so far.(data-race here)
+	long nextIt;	    	//next iteration
+
+  	int teamThreads;     	//implicit barrier:
+	pthread_barrier_t barrier;
+
 } miniomp_loop_t;
 
 #define ws_STATIC 	0
@@ -15,7 +24,5 @@ typedef struct {
 #define ws_GUIDED 	3
 #define ws_RUNTIME 	4
 #define ws_AUTO 	5
-
-#define ws_NULL 	-1
 
 extern miniomp_loop_t miniomp_loop;

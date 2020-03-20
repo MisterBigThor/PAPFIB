@@ -1,21 +1,18 @@
 #include "libminiomp.h"
 
-// Declaratiuon of global variable for loop work descriptor
+#define lock(t) pthread_mutex_lock(&t);
+#define unlock(t) pthread_mutex_unlock(&t);
+
 miniomp_loop_t miniomp_loop;
 
-/* The *_next routines are called when the thread completes processing of  
-   the iteration block currently assigned to it.  If the work-shar
-   construct is bound directly to a parallel construct, then the iteration
-   bounds may have been set up before the parallel.  In which case, this
-   may be the first iteration for the thread.
-
-   Returns true if there is work remaining to be performed; *ISTART and
-   *IEND are filled with a new iteration block.  Returns false if all work
-   has been assigned.  */
-
 bool GOMP_loop_dynamic_next (long *istart, long *iend) {
-  printf("TBI: Asking for more iterations? I gave you all at the beginning, no more left ...\n");
-  return(false);
+	#if _DEBUG
+		printf("(%u)LOOP: more iterations\n?");
+	#endif
+	//fill new iterations? return if still more it's.
+//	*istart = NULL;
+//	*iend = NULL;
+	return(false);
 }
 
 /* The *_start routines are called when first encountering a loop construct
@@ -31,29 +28,50 @@ bool GOMP_loop_dynamic_next (long *istart, long *iend) {
    allocated to this thread.  Returns false if all work was assigned to
    other threads prior to this thread's arrival.  */
 
-bool
-GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size,
+bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size,
 			long *istart, long *iend)
 {
-	if(miniomp_loop.schedule == ws_NULL){
+	if(__sync_bool_compare_and_swap(&miniomp_loop.inicialized, false, true)){
+		miniomp_loop.start = start;
+		miniomp_loop.end = end;
+		miniomp_loop.incr = incr;
+		miniomp_loop.chunk_size = chunk_size;
 
+		pthread_mutex_init(&miniomp_loop.mutexItDone, NULL);
+		pthread_mutex_init(&miniomp_loop.mutexNextIt, NULL);
+
+		miniomp_loop.teamThreads = omp_get_num_threads();
+		pthread_barrier_init(&miniomp_loop.barrier, NULL, miniomp_loop.teamThreads);//?
+
+		miniomp_loop.nextIt = 0;
+		#if _DEBUG
+			printf("(%u)LOOP: init the descriptor.\n", omp_get_thread_num());
+		#endif
 	}
-	printf("TBI: What a mess! Starting a non-static for worksharing construct and dont know what to do, I'll take it all\n");
-  	*istart = start;
-  	*iend = end;
-  	return(true);
+
+	bool ret = true;
+	lock(miniomp_loop.mutexNextIt)
+		*istart = miniomp_loop.nextIt;
+		*iend = miniomp_loop.nextIt + miniomp_loop.chunk_size;
+		long todo = miniomp_loop.end - miniomp_loop.nextIt;
+		if(todo < 0) ret = false;
+		else miniomp_loop.nextIt += miniomp_loop.chunk_size;
+	unlock(miniomp_loop.mutexItDone)
+	return ret;
 }
 
-/* The GOMP_loop_end* routines are called after the thread is told that
-   all loop iterations are complete.  The first version synchronize
-   all threads; the nowait version does not. */
-
 void GOMP_loop_end (void) {
-  printf("TBI: Finishing a for worksharing construct with non static schedule\n");
+	#if _DEBUG
+		printf("(%u)LOOP: loop_end -> waiting for the rest:\n", omp_get_thread_num());
+	#endif
+	pthread_barrier_wait(&miniomp_loop.barrier);
 }
 
 void GOMP_loop_end_nowait (void) {
-  printf("TBI: Finishing a for worksharing construct with non static schedule, with nowait clause\n");
+	#if _DEBUG
+		printf("(%u)LOOP: loop_end_nowait\n", omp_get_thread_num());
+	#endif
+	return;
 }
 
 #if 0

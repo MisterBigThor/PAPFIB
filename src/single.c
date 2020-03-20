@@ -21,8 +21,6 @@ bool GOMP_single_start (void)
 		#endif
 		return(false);
 	}
-//  	printf("TBI: Entering into single, but don't know who else arrived so I proceed\n");
-
 }
 
 
