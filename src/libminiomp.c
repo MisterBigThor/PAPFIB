@@ -20,7 +20,9 @@ void init_miniomp(void) {
 	miniomp_parallel = malloc(MAX_THREADS * sizeof(miniomp_parallel_t));
 
 	pthread_key_create(&miniomp_specifickey, NULL);
-	pthread_setspecific(miniomp_specifickey, (void *) 0); // implicit initial pthread with id=0
+	miniomp_parallel_t * miniomp_main = (miniomp_parallel_t *) malloc(sizeof(miniomp_parallel_t));
+	miniomp_main->id = 0;
+	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
 
 	// Initialize OpenMP default lock and default barrier
 	#if _DEBUG
