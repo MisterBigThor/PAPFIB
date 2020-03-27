@@ -51,7 +51,6 @@ struct list_head {
  *   }
  */
 
-
 /**
  * INIT_LIST_HEAD - Initializes an empty list.
  * @head: list head to initialize
