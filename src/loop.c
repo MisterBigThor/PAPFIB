@@ -1,7 +1,5 @@
 #include "libminiomp.h"
 
-#define lock(t) pthread_mutex_lock(&t);
-#define unlock(t) pthread_mutex_unlock(&t);
 
 miniomp_loop_t miniomp_loop;
 

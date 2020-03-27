@@ -15,6 +15,12 @@
 // Debug for the internal printf
 #define _DEBUG 1
 
+// Some defines:
+#define lock(t) pthread_mutex_lock(&t);
+#define unlock(t) pthread_mutex_unlock(&t);
+#define ID omp_get_thread_num()
+#define TEAM omp_get_num_threads()
+
 // To implement memory barrier (flush)
 //void __atomic_thread_fence(int);
 #define mb() __atomic_thread_fence(3)
@@ -30,4 +36,7 @@
 #include "list.h"
 
 void updateNumThreads(int numThreads);
+
+
+
 #endif
