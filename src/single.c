@@ -6,42 +6,26 @@ miniomp_single_t miniomp_single;
 /* This routine is called when first encountering a SINGLE construct. 
    Returns true if this is the thread that should execute the clause.  */
 bool GOMP_single_start (void){
-//thread mantiene una cuenta 'privada' de cuantos singles ha atravesado.
-//aceder a la ultima posicion de la lista donde este el single.
-
 	struct listElement* actualSingle = getNelement(miniomp_single.listSize[ID]);
-	if(actualSingle->here[ID]) {
-		//atomic:
-		initAndAsignSingle(ID);
+	if(actualSingle->here[ID]) { // ya he pasado por aqui, nueva isntancia de single:
+		printf("(%u)Ya he pasado por este single\n", ID);
+		initAndAsignSingle(ID); //atomic here!
 		return true;
 	}
 	//this thread didn't pass this single, let's see if is the first one:
+	//in the two cases, ++listSize;
 	else if((__sync_fetch_and_add(&(actualSingle->i), 1))== 1) {
-
+		printf("(%u)Soy el elegido para el single\n", ID);
 		actualSingle->here[ID] = true;
+		miniomp_single.listSize[ID]++;
 		return true;
-
 	}
-
 	else {
-
+		printf("(%u)No soy el elegido\n", ID);
+		miniomp_single.listSize[ID]++;
 		return false;
 	}
-/*
-	if(__sync_bool_compare_and_swap(&miniomp_single.singleActivation, false, true)){
-		miniomp_single.idSingleThread = omp_get_thread_num();
-		#if _DEBUG
-		printf("SINGLE: YES!,I'm the single one \n");
-		#endif
-		return(true);
-	}
-	else {
-		#if _DEBUG
-		printf("SINGLE: I'm not the single one :( \n");
-		#endif
-		return(false);
-	}
-*/
+	printf("Problems!!!!\n");
 	return false;
 }
 
@@ -59,9 +43,17 @@ void initAndAsignSingle(int id){
 	ret.here[id] = 1; //this is the thread that will run the single.
 	miniomp_single.listSize[id]++;
 }
+
+//list_entry(ptr,struct listElement, anchor);
+//return the n element in the list.
 struct listElement * getNelement(int n){
-	//TBI: dema?
-	return NULL;
+	struct list_head * list = list_first(&miniomp_single.listSingle); 
+	while(n > 0){
+		list = list->next;
+		n--;
+	}
+	struct listElement * ret = list_entry(list, struct listElement, anchor);
+	return ret;
 }
 
 
