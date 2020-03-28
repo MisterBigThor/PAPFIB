@@ -7,6 +7,7 @@ miniomp_single_t miniomp_single;
    Returns true if this is the thread that should execute the clause.  */
 bool GOMP_single_start (void){
 	struct listElement* actualSingle = getNelement(miniomp_single.listSize[ID]);
+	printf("(%u)size actual :%u\n", ID , miniomp_single.listSize[ID]);
 	if(actualSingle->here[ID]) { // ya he pasado por aqui, nueva isntancia de single:
 		printf("(%u)Ya he pasado por este single\n", ID);
 		initAndAsignSingle(ID); //atomic here!
