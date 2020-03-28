@@ -1,0 +1,3 @@
+H -2147483589 "PAPI_TOT_CYC [Total cycles]"
+H -2147483598 "PAPI_TOT_INS [Instr completed]"
+H -2147483626 "PAPI_TLB_TL [Total TLB misses]"
