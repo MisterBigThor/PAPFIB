@@ -15,7 +15,7 @@ typedef struct {
 
 struct listElement{
 	unsigned int i; 		//number of thread that reach this single instance.
-	bool here[MAX_THREADS];		//indexed by num_thread
+	char here[MAX_THREADS];		//indexed by num_thread
 	struct list_head anchor;	//anchor to the next listElement.
 };
 
