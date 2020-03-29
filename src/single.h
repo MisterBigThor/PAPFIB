@@ -11,6 +11,8 @@ typedef struct {
 	struct list_head listSingle;
 	int listSize[MAX_THREADS]; 	//listSize points to the 'last' single designation for each thread.
 	pthread_mutex_t mutexSingle;	//mutex for an atomic add_to_list.
+	unsigned int pending[MAX_THREADS]; //actualizacionesPendientes
+	unsigned int maxSingle;		//the max single reached.
 } miniomp_single_t;
 
 struct listElement{

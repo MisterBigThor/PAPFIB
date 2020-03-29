@@ -5,48 +5,58 @@
 miniomp_single_t miniomp_single;
 
 bool GOMP_single_start (void){
+	bool ret = false;
 	struct listElement* actualSingle = getNelement(miniomp_single.listSize[ID]);
-
-	if(actualSingle->here[ID]) { // ya he pasado por aqui, nueva isntancia de single:
-		#if _DEBUG
-		printf("(%u)Ya he pasado por este single\n", ID);
-		#endif
-		initAndAsignSingle(ID);
+	//first time in this single?
+	if(actualSingle->here[ID]) {
+		int tl = pthread_mutex_trylock(&miniomp_single.mutexSingle);
+		if(t1 == EBUSY) {
+			ret = false; //ya han llegado y estan creando el nuevo single
+			miniomp_single.pending[ID]++;
+		}
+		else if(t1 == 0 && (miniomop_single.maxSingle == actualSingle.listSize[ID]){ //soy el primero en llegar?
+			actualSingle.maxSingle++;
+			initAndAsingSingle(ID);
+			ret = true;
+		}
+		else {
+			
+			ret = false;
+		}
+		unlock(miniomp_single.mutexSingle);
 		return true;
 	}
 	//this thread didn't pass this single, let's see if is the first one:
-	//in the two cases, ++listSize;
-	unsigned int r = __sync_add_and_fetch(&(actualSingle->i), 1);
-//	printf("%x -> %u\n",&(actualSingle->i) ,r);
-	if(r == 1) {
+	else if(__sync_add_and_fetch(&(actualSingle->i), 1) == 1) {
 		#if _DEBUG
 		printf("(%u)Soy el elegido para el single\n", ID);
 		#endif
-		actualSingle->here[ID] = true;
-		return true;
+		ret = true;
 	}
-	else {
-		#if _DEBUG
-		printf("(%u)No soy el elegido\n", ID);
-		#endif
-		actualSingle->here[ID] = true;
-		return false;
-	}
-	printf("Problems!!!!\n");
-	return false;
+	actualSingle->here[ID] = true;
+	return ret;
 }
-
 
 void initSingle(void){
 	INIT_LIST_HEAD(&miniomp_single.listSingle);
 	pthread_mutex_init(&miniomp_single.mutexSingle, NULL);
 	struct listElement * ret = malloc(sizeof(struct listElement));
 	ret->i = 0;
-	list_add_tail(&(ret->anchor),&miniomp_single.listSingle); //'chronologic'
+	list_add_tail(&(ret->anchor),&miniomp_single.listSingle);
+	miniomp_single.maxSingle = 1;
 }
-//this operation needs to be atomic!
+void destroySingle(void){
+	#if _DEBUG
+	pritnf("single reached by the threads: %u\n", miniomp_single.maxSingle);
+	for(int i = 0; i<MAX_THREADS; ++i){
+		printf("Singles in %u %u\n", i, miniomp_single.listSize[i]);
+	}
+	#endif
+}
 void initAndAsignSingle(int id){
-	printf("init a new Single.\n");
+	#if _DEBUG
+	printf("(%u)Init a new SingleInstance.\n", ID);
+	#endif
 	struct listElement * ret = malloc(sizeof(struct listElement));
 	ret->i = 1;
 	list_add_tail(&(ret->anchor),&miniomp_single.listSingle);

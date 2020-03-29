@@ -8,7 +8,7 @@ OMP_NUM_THREADS=4 ./tsingle1-omp
 echo "********************"
 
 echo "======SINGLE1-gomp=========="
-make tsingle1-omp
+make tsingle1-gomp
 OMP_NUM_THREADS=4 ./tsingle1-gomp
 echo "********************"
 
