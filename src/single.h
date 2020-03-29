@@ -8,26 +8,16 @@
 //if a thread is in the list -> we have a new single!
 
 typedef struct {
-	struct list_head listSingle;
-	int listSize[MAX_THREADS]; 	//listSize points to the 'last' single designation for each thread.
+	unsigned int singles[MAX_THREADS]; 	//listSize points to the 'last' single designation for each thread.
 	pthread_mutex_t mutexSingle;	//mutex for an atomic add_to_list.
-	unsigned int pending[MAX_THREADS]; //actualizacionesPendientes
-	unsigned int maxSingle;		//the max single reached.
+	unsigned int max;
 } miniomp_single_t;
-
-struct listElement{
-	unsigned int i; 		//number of thread that reach this single instance.
-	bool here[MAX_THREADS]; //single identifier.[1, 2, 3, ...4]
-	struct list_head anchor;	//anchor to the next listElement.
-};
-
 
 // Declaration of global variable for single work descriptor
 extern miniomp_single_t miniomp_single;
 
-
 //inicialize a new Single control item, and appends to the list.
 void initSingle(void);
-void initAndAsignSingle(int id);
-struct listElement * getNelement(int n);
+void destroySingle(void);
+
 #endif

@@ -13,11 +13,13 @@
 // To be used whenever you need to dimension thread-related structures
 #define MAX_THREADS 32
 // Debug for the internal printf
-#define _DEBUG 0
+#define _DEBUG 1
 
 // Some defines:
 #define lock(t) pthread_mutex_lock(&t);
 #define unlock(t) pthread_mutex_unlock(&t);
+#define trylock(t) pthread_mutex_trylock(&t);
+
 #define ID omp_get_thread_num()
 #define TEAM omp_get_num_threads()
 

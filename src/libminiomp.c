@@ -57,6 +57,8 @@ void fini_miniomp(void) {
 	pthread_barrier_destroy(&miniomp_barrier); // free default barrier
 
 	destroyMap();
+
+	destroySingle();	
 	#if _DEBUG
 	printf ("mini-omp is finalized\n");
 	#endif

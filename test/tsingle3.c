@@ -11,7 +11,7 @@
 int main(int argc, char *argv[]) {
 	#pragma omp parallel
 	for(int i = 0; i < N; ++i){
-		#pragma omp single
+		#pragma omp single nowait
 		printf("%i Only one thread here, I'm %u!\n", i,omp_get_thread_num());
 	}
 	printf("end\n");
