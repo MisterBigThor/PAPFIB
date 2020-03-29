@@ -46,10 +46,10 @@ pthread_barrier_t miniomp_barrier;
 
 void GOMP_barrier() {
 #if _DEBUG
-	printf("(%u)GOMP_barrier: entering barrier \n", omp_get_thread_num());
+	printf("(%u)GOMP_barrier: entering barrier \n", ID);
 #endif
 	pthread_barrier_wait(&miniomp_barrier);
 #if _DEBUG
-	printf("(%u) GOMP_barrier: ended the barrier \n", omp_get_thread_num());
+	printf("(%u)GOMP_barrier: ended the barrier \n", ID);
 #endif
 }

@@ -8,13 +8,14 @@
 
 
 int main(int argc, char *argv[]) {
-	#pragma omp parallel num_threads(3)
-	#pragma omp single
+	#pragma omp parallel num_threads(4)
+	#pragma omp single nowait
 	{
 		printf("Only one thread here, I'm %u!\n", omp_get_thread_num());
 	}
-	#pragma omp single
+	#pragma omp single nowait
 	{
-		printf("Only one thread here, I'm %u!\n.", omp_get_thread_num());
+		printf("Second single Only one thread here, I'm %u!\n.", omp_get_thread_num());
 	}
+	printf("end\n");
 }

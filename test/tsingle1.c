@@ -14,5 +14,4 @@ int main(int argc, char *argv[]) {
 	{
 		printf("Only one thread here, I'm %u!\n", omp_get_thread_num());
 	}
-	printf("Everyone must print this\n");
 }

@@ -20,7 +20,7 @@ void *worker(void *args) {
 	miniomp_parallel_t * aaa = pthread_getspecific(miniomp_specifickey);
 	aux->fn(aaa->fn_data);
 	pthread_exit(NULL);
-	return(NULL);
+	return NULL;
 }
 
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
@@ -37,11 +37,7 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 //		miniomp_parallel[i].nestedLevel = n; internal variable
 		pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 	}
-
 	for(int i = 0; i < num_threads; i++){
-		#if _DEBUG
-			printf("Waiting for all team threads to finish.\n");
-		#endif
 		pthread_join(miniomp_threads[i], NULL);
 	}
 

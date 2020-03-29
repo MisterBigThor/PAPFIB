@@ -15,7 +15,7 @@ typedef struct {
 
 struct listElement{
 	unsigned int i; 		//number of thread that reach this single instance.
-	char here[MAX_THREADS];		//indexed by num_thread
+	bool here[MAX_THREADS]; //single identifier.[1, 2, 3, ...4]
 	struct list_head anchor;	//anchor to the next listElement.
 };
 
@@ -25,7 +25,7 @@ extern miniomp_single_t miniomp_single;
 
 
 //inicialize a new Single control item, and appends to the list.
-void initNewSingle(void);
+void initSingle(void);
 void initAndAsignSingle(int id);
 struct listElement * getNelement(int n);
 #endif
