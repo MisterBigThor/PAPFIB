@@ -20,6 +20,11 @@ typedef struct {
 
 } miniomp_loop_t;
 
+/*LIST OF miniomp_loop_t
+typedef struct{
+	
+}loops;
+*/
 #define ws_STATIC 	0
 #define ws_STATICCHUNK 	1
 #define ws_DYNAMIC 	2
@@ -28,5 +33,8 @@ typedef struct {
 #define ws_AUTO 	5
 
 extern miniomp_loop_t miniomp_loop;
+
+void initLoop(void);
+void clearLoop(void);
 
 #endif
