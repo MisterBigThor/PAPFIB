@@ -9,8 +9,10 @@
 //i: [i*chunk=A, A+chunk-1]
 //0: [0, 10]
 int main(int argc, char *argv[]){
-	printf("%s\n", argv[0]);
-	if(argc != 5) exit(0);
+	if(argc != 5) {
+		printf("Usage: ./name start end chunk_size incr\n");
+		exit(0);
+	}
 	int start = atoi(argv[1]);
 	int end = atoi(argv[2]);
 	int chunk = atoi(argv[3]);
@@ -25,11 +27,11 @@ int main(int argc, char *argv[]){
 	for(int i = 0; i < l;++i){
 		if(i==l-1){
 			printf("ultima: ");
-			int s = i*chunk;
+			int s = start+(i*chunk);
 			int e = s + chunk-1;
 			e = end;
 			printf("[%u,%u]\n", s, e);
 		}
-		else printf("%u->[%u, %u]\n",i ,i*chunk, (i*chunk)+chunk-1);
+		else printf("%u->[%u, %u]\n",i ,start+(i*chunk), (start+(i*chunk))+chunk-1);
 	}
 }
