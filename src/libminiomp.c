@@ -10,7 +10,7 @@ void parse_env(void);
 
 void init_miniomp(void) {
 	#if _DEBUG
-	printf ("mini-omp is being initialized\n");
+		printf ("mini-omp is being initialized\n");
 	#endif
 
 	// Parse OMP_NUM_THREADS environment variable to initialize nthreads_var internal control variable
@@ -25,8 +25,8 @@ void init_miniomp(void) {
 	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
 
 	// Initialize OpenMP default lock and default barrier
-	#if _DEBUG
-	printf("Initialized default OMP barrier with %u \n", miniomp_icv.nthreads_var);
+	#if _DEBUG && _LIBDBG
+		printf("Initialized default OMP barrier with %u \n", miniomp_icv.nthreads_var);
 	#endif
 	pthread_barrier_init(&miniomp_barrier, NULL, miniomp_icv.nthreads_var);
 	pthread_mutex_init(&miniomp_default_lock, NULL);
@@ -41,7 +41,7 @@ void init_miniomp(void) {
 
 void updateNumThreads(int numThreads){
 	#if _DEBUG
-		printf("Refresh the num_threads, for the default barrier.\n");
+		printf("Refresh the num_threads with %i, for the default barrier.\n", numThreads);
 	#endif
 	miniomp_icv.nthreads_var = numThreads;
 	pthread_barrier_init(&miniomp_barrier, NULL, numThreads);
@@ -58,9 +58,9 @@ void fini_miniomp(void) {
 
 	destroyMap();
 
-	destroySingle();	
+	destroySingle();
 	#if _DEBUG
-	printf ("mini-omp is finalized\n");
+		printf ("mini-omp is finalized\n");
 	#endif
 }
 

@@ -1,5 +1,5 @@
 #include "libminiomp.h"
-
+#define _DBGPARALLEL 0
 /*
 File for implement the Parallel constructor.
 It used an array of pthreads_t, a struct to control the worker of all threads,
@@ -13,7 +13,7 @@ pthread_key_t miniomp_specifickey;
 
 void *worker(void *args) {
 	miniomp_parallel_t *aux = args;
-	#if _DEBUG
+	#if _DEBUG && _DBGPARALLEL
 		printf("PARALLEL:Thread %d in worker\n", aux->id);
 	#endif
 	pthread_setspecific(miniomp_specifickey, (void *)aux);
@@ -26,7 +26,7 @@ void *worker(void *args) {
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
 	if(!num_threads) num_threads = omp_get_num_threads();
 	else updateNumThreads(num_threads);
-	#if _DEBUG
+	#if _DEBUG && _DBGPARALLEL
 		printf("Starting: a parallel region using %d threads\n", num_threads);
 	#endif
 
@@ -34,7 +34,6 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 		miniomp_parallel[i].id = i;
 		miniomp_parallel[i].fn_data = data;
 		miniomp_parallel[i].fn = fn;
-//		miniomp_parallel[i].nestedLevel = n; internal variable
 		pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 	}
 	for(int i = 0; i < num_threads; i++){

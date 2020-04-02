@@ -10,8 +10,11 @@
 
 int main(int argc, char *argv[]) {
 	#pragma omp parallel
-	#pragma omp single
 	{
-		printf("Only one thread here, I'm %u!\n", omp_get_thread_num());
+		#pragma omp single
+		{
+			printf("Only one thread here, I'm %u!\n", omp_get_thread_num());
+		}
+		printf("Hi!, I'm thread %u\n", omp_get_thread_num());
 	}
 }

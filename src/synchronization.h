@@ -9,8 +9,6 @@ extern pthread_mutex_t miniomp_default_lock;
 // Default barrier within a parallel region
 extern pthread_barrier_t miniomp_barrier;
 
-//Definition of a key-value array:
-
 
 // Functions implemented in this module
 void GOMP_critical_start (void);

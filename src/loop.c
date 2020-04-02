@@ -25,32 +25,8 @@ bool GOMP_loop_dynamic_next (long *istart, long *iend) {
    *ISTART and *IEND are filled with the bounds of the iteration block
    allocated to this thread.  Returns false if all work was assigned to
    other threads prior to this thread's arrival.  */
-/*
-SI  (END-START)%CHUNK_SIZE != 0 -->NUM_CHUNKS
-ELSE --> NUM_CHUNKS
-bool[NUM_CHUNKS] --> 1 --> ASIGNADO BLOQUE DE ITERACIONES (data-race)
-bool[i] --> start = chunk_size
-
-
-start 0, end 100, chunksize = 10, incr = 1.
-bool[100/10]
-bool[0] start = 0*chunksize = 0 , end = start + chunksize -1 = 9
-bool[1] start = 1*chunksize = 10, end = start + chunksize -1 = 19
-bool[2] start = 2*chunksize = 20, end = start + chunksize -1 = 29
-bool[i] start = i*chunksize     , end = start + chunksize -1;
-bool[9] -> [90, 99] si es el ultimo sumamos 1 ?
-
-start 0, end 100 chunksize = 10, incr = 2
-bool[0] = 
-
-start 0, end 100 chunksize = 7, incr = 1
-bool[100/7] = bool[14.28]->bool[15]
-bool[0] -> [0, 6]
-bool[1] -> [7, 13]
-bool[i] -> [i*7, (i*7)+chunksize-1]
-bool[13] ->[91, 97]
-bool[14] ->[98, 104] el ulitmo se ajusta a necesidad.(falta o sobran < chunksize)
-*/
+//Solucion 1: Calcular a traves de la i cad start, end. <==definitivamente 
+//Solucion 2: Calcular en el start todos los start, end.
 
 bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend)
 {
