@@ -2,8 +2,8 @@
 #define _LOOP_H
 // Type declaration for loop worksharing descriptor
 typedef struct {
-	bool inicialized;    	//constructor exists.
-
+	int init;    	//constructor exists.
+	
  	long start;           	// loop bounds and increment.
  	long end;
   	long incr;
@@ -16,6 +16,8 @@ typedef struct {
 	pthread_mutex_t mutexMyChunks; //data race over myChunks;
 	bool *myChunks;
 	int sizeMyChunks;
+
+	int initLoops;
 } miniomp_loop_t;
 
 #define ws_STATIC 	0
@@ -31,3 +33,4 @@ void initLoop(void);
 void clearLoop(void);
 
 #endif
+

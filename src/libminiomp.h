@@ -29,9 +29,9 @@
 #endif
 */
 #ifdef _DEBUG
-#define LOG(C) printf(C);
+#define LOG printf
 #else
-#define LOG(C)
+#define LOG //
 #endif
 
 // To implement memory barrier (flush)

@@ -16,25 +16,20 @@ bool GOMP_single_start (void){
 }
 
 void initSingle(void){
-	#if _DEBUG & _DBGSINGLE
-		printf("SINGLE: init structures\n");
-		miniomp_single.max = 0;
-		for(int i = 0;i<MAX_THREADS; ++i) miniomp_single.singles[i] = 0;
-	#endif
-	LOG("SING\n")
+	LOG("SINGLE: init structures\n");
+	miniomp_single.max = 0;
+	for(int i = 0;i<MAX_THREADS; ++i) miniomp_single.singles[i] = 0;
 	return;
 }
 void destroySingle(void){
-	#if _DEBUG & _DBGSINGLE
-		printf("SINGLE: free structures\n");
-		printf("SINGLE STATS:\n");
-		printf("	SINGLES REACHED: %u\n", miniomp_single.max);
+		LOG("SINGLE: free structures\n");
+		LOG("SINGLE STATS:\n");
+		LOG("	SINGLES REACHED: %u\n", miniomp_single.max);
 		if(miniomp_single.max <= 0) return;
 		for(int i = 0; i<MAX_THREADS; ++i){
-			printf("[%u] = %u ", i, miniomp_single.singles[i]);
-			if((i % 4 == 0) & (i != 0)) printf("\n");
+			LOG("[%u] = %u ", i, miniomp_single.singles[i]);
+			if((i % 4 == 0) & (i != 0)) LOG("\n");
 		}
-		printf("\n");
-		printf("SINGLE STATS\n");
-	#endif
+		LOG("\n");
+		LOG("SINGLE STATS\n");
 }
