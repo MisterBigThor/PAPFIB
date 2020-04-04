@@ -23,6 +23,17 @@
 #define ID omp_get_thread_num()
 #define TEAM omp_get_num_threads()
 
+/*
+#if _DEBUG
+
+#endif
+*/
+#ifdef _DEBUG
+#define LOG(C) printf(C);
+#else
+#define LOG(C)
+#endif
+
 // To implement memory barrier (flush)
 //void __atomic_thread_fence(int);
 #define mb() __atomic_thread_fence(3)

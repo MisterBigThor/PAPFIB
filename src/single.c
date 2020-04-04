@@ -21,6 +21,7 @@ void initSingle(void){
 		miniomp_single.max = 0;
 		for(int i = 0;i<MAX_THREADS; ++i) miniomp_single.singles[i] = 0;
 	#endif
+	LOG("SING\n")
 	return;
 }
 void destroySingle(void){
