@@ -24,12 +24,12 @@ void initSingle(void){
 void destroySingle(void){
 		LOG("SINGLE: free structures\n");
 		LOG("SINGLE STATS:\n");
-		LOG("	SINGLES REACHED: %u\n", miniomp_single.max);
+		LOG("	singles reached: %u\n", miniomp_single.max);
 		if(miniomp_single.max <= 0) return;
 		for(int i = 0; i<MAX_THREADS; ++i){
-			LOG("[%u] = %u ", i, miniomp_single.singles[i]);
+			LOG("[%u] = %u	", i, miniomp_single.singles[i]);
 			if((i % 4 == 0) & (i != 0)) LOG("\n");
 		}
 		LOG("\n");
-		LOG("SINGLE STATS\n");
+		LOG("=============================================\n");
 }

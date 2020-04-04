@@ -10,7 +10,12 @@ extern pthread_mutex_t miniomp_default_lock;
 extern pthread_barrier_t miniomp_barrier;
 
 
+
 // Functions implemented in this module
+
+void initSync(void);
+void clearSync(void);
+
 void GOMP_critical_start (void);
 void GOMP_critical_end (void);
 void GOMP_critical_name_start (void **pptr);

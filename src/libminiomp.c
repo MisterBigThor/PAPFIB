@@ -23,9 +23,7 @@ void init_miniomp(void) {
 	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
 
 	// Initialize OpenMP default lock and default barrier
-	LOG("Initialized default OMP barrier with %u \n", miniomp_icv.nthreads_var);
-	pthread_barrier_init(&miniomp_barrier, NULL, miniomp_icv.nthreads_var);
-	pthread_mutex_init(&miniomp_default_lock, NULL);
+	initSync();
 	initMap();
 
 	// Initialize OpenMP workdescriptors for for and single
@@ -46,11 +44,9 @@ void fini_miniomp(void) {
 	pthread_key_delete(miniomp_specifickey);
 
 	// free other data structures allocated during library initialization
-	pthread_mutex_destroy(&miniomp_default_lock);
-	pthread_barrier_destroy(&miniomp_barrier); // free default barrier
-
+	
 	destroyMap();
-
+	clearSync();
 	destroySingle();
 	clearLoop();
 

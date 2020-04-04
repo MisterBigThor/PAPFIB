@@ -22,6 +22,7 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 
 void GOMP_loop_end (void) {
 	LOG("(%u)LOOP: loop end\n", ID);
+	ctrlLoops.ended[ID]++;
 	struct loopDescr * miniomp_loop = getNdescriptor(ctrlLoops.ended[ID]-1);
 	pthread_barrier_wait(&miniomp_loop->barrier);
 	return;
@@ -46,8 +47,17 @@ void initLoop(void){
 }
 
 void clearLoop(void){
+	LOG("LOOP STATS:\n");
+	LOG("	loops reached: 	 %i\n", ctrlLoops.initLoops);
+	LOG("	loops completed: %i\n", ctrlLoops.actualLoop);
+	LOG("[i] = reached ended\n");
+	for(int i = 0; i < MAX_THREADS; ++i){
+		LOG("[%u] = %u %u	", i, ctrlLoops.reached[i], ctrlLoops.ended[i]);
+		if((i % 4==0) & (i != 0)) LOG("\n");
+	}
+	LOG("\n");
+	LOG("=============================\n");
 	LOG("LOOP: clear data & structures\n");
-	LOG("LOOP: loops reached: %i\n", ctrlLoops.initLoops);
 	pthread_mutex_destroy(&ctrlLoops.mutexLoop);
 }
 

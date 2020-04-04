@@ -7,17 +7,28 @@ File for implement the barrier and critical section (named & unnamed).
 Uses a key-value, inicialized in the lib, for contain all the names and locks.
 */
 
+void initSync(void){
+	LOG("SYNC: init structures with %u \n", TEAM);
+	pthread_barrier_init(&miniomp_barrier, NULL, TEAM);
+	pthread_mutex_init(&miniomp_default_lock, NULL);
+}
+
+void clearSync(void){
+	pthread_mutex_destroy(&miniomp_default_lock);
+	pthread_barrier_destroy(&miniomp_barrier); // free default barrier
+}
+
 //UNNAMED CRITICAL SECTION: Default lock for unnamed critical sections
 pthread_mutex_t miniomp_default_lock;
 
 void GOMP_critical_start (void) {
-	pthread_mutex_lock(&miniomp_default_lock);
 	LOG("Locking the default lock for no-name critical\n");
+	pthread_mutex_lock(&miniomp_default_lock);
 }
 
 void GOMP_critical_end (void) {
-	pthread_mutex_unlock(&miniomp_default_lock);
 	LOG("Unlocking the default lock for no-name critical\n");
+	pthread_mutex_unlock(&miniomp_default_lock);
 }
 
 //NAMED CRITICAL SECTION:
