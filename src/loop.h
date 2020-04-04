@@ -10,21 +10,14 @@ typedef struct {
   	int schedule;         	// schedule kind for loop.
   	long chunk_size;
 
-	pthread_mutex_t mutexItDone;
-	pthread_mutex_t	mutexNextIt;
-	long itDone;	     	//its done so far.(data-race here)
-	long nextIt;	    	//next iteration
-
   	int teamThreads;     	//implicit barrier:
 	pthread_barrier_t barrier;
 
+	pthread_mutex_t mutexMyChunks; //data race over myChunks;
+	bool myChunks[];
+
 } miniomp_loop_t;
 
-/*LIST OF miniomp_loop_t
-typedef struct{
-	
-}loops;
-*/
 #define ws_STATIC 	0
 #define ws_STATICCHUNK 	1
 #define ws_DYNAMIC 	2
