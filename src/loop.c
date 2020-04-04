@@ -57,6 +57,7 @@ void initLoop(void){
 	ctrlLoops.initLoops = 0;
 	pthread_mutex_init(&ctrlLoops.mutexLoop, NULL);
 	INIT_LIST_HEAD(&ctrlLoops.loopList);
+	for(int i = 0; i<MAX_THREADS;++i) ctrlLoops.reached[i] = 0;
 }
 
 void clearLoop(void){
@@ -68,9 +69,21 @@ void clearLoop(void){
 void initDescriptor(long start, long end, long incr, long chunk_size){
 	struct loopDescr * miniomp_loop = malloc(sizeof(struct loopDescr));
 	int l = (end-start)/chunk_size + (end-start)%chunk_size;
+
 	miniomp_loop->myChunks = malloc(sizeof(bool)*l);
 	miniomp_loop->sizeMyChunks = l;
+	miniomp_loop->start = start;
+	miniomp_loop->end = end;
+	miniomp_loop->incr = incr;
+	miniomp_loop->chunk_size = chunk_size;
+	miniomp_loop->teamThreads = TEAM;
+	miniomp_loop->threadInit = ID;
+
+	pthread_barrier_init(&(miniomp_loop->barrier),NULL,TEAM);
+	pthread_mutex_init(&(miniomp_loop->mutex), NULL);
+
 	list_add_tail(&(miniomp_loop->anchor), &(ctrlLoops.loopList));
+	ctrlLoops.initLoops++;
 	LOG("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
 }
 bool allocateIterations(long *istart, long *iend){

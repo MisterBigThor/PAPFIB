@@ -7,7 +7,6 @@
 typedef struct {
 	int initLoops;
 	int reached[MAX_THREADS];
-	int actual;
 	pthread_mutex_t mutexLoop;
 	struct list_head loopList;
 }miniomp_loop;
@@ -21,7 +20,9 @@ struct loopDescr {
 
 	int teamThreads;
 	int threadInit;
+
 	pthread_barrier_t barrier;
+	pthread_mutex_t mutex;
 
 	bool *myChunks;
 	int sizeMyChunks;
