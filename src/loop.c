@@ -19,9 +19,6 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 		return ret;
 	}
 	if((tl == 0) & (miniomp_loop->inicialized)){
-		#if _DEBUG
-		printf("(%u)LOOP: ya esta inicializado\n", ID);
-		#endif
 		unlock(miniomp_loop->mutexMyChunks)
 		return allocateIterations(istart,iend);
 	}
