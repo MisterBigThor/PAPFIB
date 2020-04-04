@@ -1,14 +1,15 @@
 #include "libminiomp.h"
 #include <errno.h>
 
-miniomp_loop_t *miniomp_loop;
+miniomp_loop ctrlLoops;
+
 void initDescriptor(long start, long end, long incr, long chunk_size);
 bool allocateIterations(long *istart, long *iend);
 
 
 bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend){
 	LOG("(%u)LOOP: Dynamic start\n", ID);
-	if(miniomp_loop->init != 0) {
+	/*if(miniomp_loop->init != 0) {
 		miniomp_loop->init++;
 		return allocateIterations(istart, iend);
 	}
@@ -28,65 +29,52 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 		return allocateIterations(istart,iend);
 	}
 	LOG("(%u)PANIC! dyn_start", ID);
+	*/
 	return false;
 }
 
 void GOMP_loop_end (void) {
-	lock(miniomp_loop->mutexMyChunks)
+/*	lock(miniomp_loop->mutexMyChunks)
 	miniomp_loop->init--;
 	unlock(miniomp_loop->mutexMyChunks)
 	LOG("(%u)LOOP: loop end\n", ID);
-	pthread_barrier_wait(&miniomp_loop->barrier);
+	pthread_barrier_wait(&minomp_loop->barrier);
+*/
+	return;
 }
 
 void GOMP_loop_end_nowait (void) {
-	lock(miniomp_loop->mutexMyChunks)
-	miniomp_loop->init--;
-	unlock(miniomp_loop->mutexMyChunks)
 	LOG("(%u)LOOP: nowait end\n", ID);
 	return;
 }
 
-void initLoop(void){
-	LOG("LOOP: init data & structures\n");
-	miniomp_loop = malloc(sizeof(miniomp_loop_t));
-	miniomp_loop->init = 0;
-	miniomp_loop->initLoops = 0;
-	pthread_mutex_init(&miniomp_loop->mutexMyChunks, NULL);
-	pthread_barrier_init(&miniomp_loop->barrier, NULL, 1);
-}
-void clearLoop(void){
-	LOG("LOOP: clear data & structures\n");
-	pthread_mutex_destroy(&miniomp_loop->mutexMyChunks);
-	pthread_barrier_destroy(&miniomp_loop->barrier);
-	LOG("LOOP: loops reached: %i\n", miniomp_loop->initLoops);
-	LOG("LOOP: loop cntr : %i\n", miniomp_loop->init);
-	free(miniomp_loop);
-}
 
 bool GOMP_loop_dynamic_next (long *istart, long *iend) {
 	return allocateIterations(istart, iend);
 }
+void initLoop(void){
+	LOG("LOOP: init data & structures\n");
+	ctrlLoops.initLoops = 0;
+	pthread_mutex_init(&ctrlLoops.mutexLoop, NULL);
+	INIT_LIST_HEAD(&ctrlLoops.loopList);
+}
+
+void clearLoop(void){
+	LOG("LOOP: clear data & structures\n");
+	LOG("LOOP: loops reached: %i\n", ctrlLoops.initLoops);
+	pthread_mutex_destroy(&ctrlLoops.mutexLoop);
+}
 
 void initDescriptor(long start, long end, long incr, long chunk_size){
-	miniomp_loop->init++;
-	int l = (end-start)/chunk_size;
-	int r = (end-start)%chunk_size;
-	if(r != 0) l++;
-	LOG("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
+	struct loopDescr * miniomp_loop = malloc(sizeof(struct loopDescr));
+	int l = (end-start)/chunk_size + (end-start)%chunk_size;
+	miniomp_loop->myChunks = malloc(sizeof(bool)*l);
 	miniomp_loop->sizeMyChunks = l;
-	miniomp_loop->myChunks = malloc (sizeof(bool)*l);
-	miniomp_loop->start = start;
-	miniomp_loop->end = end;
-	miniomp_loop->incr = incr;
-	miniomp_loop->chunk_size = chunk_size;
-	miniomp_loop->schedule = ws_DYNAMIC;
-	miniomp_loop->teamThreads = omp_get_num_threads();
-	pthread_barrier_init(&miniomp_loop->barrier, NULL, miniomp_loop->teamThreads);
-	for(int i = 0; i < l; ++i) miniomp_loop->myChunks[i] = false;
-	miniomp_loop->initLoops++;
+	list_add_tail(&(miniomp_loop->anchor), &(ctrlLoops.loopList));
+	LOG("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
 }
 bool allocateIterations(long *istart, long *iend){
+	/*
 	lock(miniomp_loop->mutexMyChunks)
 	if(miniomp_loop->init == 0) printf("(%u)LOOP: PANIC!\n",ID);
 	int i = 0;
@@ -103,6 +91,7 @@ bool allocateIterations(long *istart, long *iend){
 	}
 	LOG("(%u)No more iterations left\n", ID);
 	unlock(miniomp_loop->mutexMyChunks)
+*/
 	return false;
 }
 
