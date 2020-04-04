@@ -13,11 +13,11 @@ pthread_key_t miniomp_specifickey;
 
 void *worker(void *args) {
 	miniomp_parallel_t *aux = args;
-	#if _DEBUG && _DBGPARALLEL
-		printf("PARALLEL:Thread %d in worker\n", aux->id);
-	#endif
 	pthread_setspecific(miniomp_specifickey, (void *)aux);
 	miniomp_parallel_t * aaa = pthread_getspecific(miniomp_specifickey);
+	#if _DEBUG && _DBGPARALLEL
+		printf("(%u)PARALLEL: worker\n", ID);
+	#endif
 	aux->fn(aaa->fn_data);
 	pthread_exit(NULL);
 	return NULL;
@@ -27,7 +27,7 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	if(!num_threads) num_threads = omp_get_num_threads();
 	else updateNumThreads(num_threads);
 	#if _DEBUG && _DBGPARALLEL
-		printf("Starting: a parallel region using %d threads\n", num_threads);
+		printf("PARALLEL: starting a parallel region using %d threads\n", num_threads);
 	#endif
 
 	for (int i=0; i<num_threads; i++){
@@ -39,6 +39,5 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	for(int i = 0; i < num_threads; i++){
 		pthread_join(miniomp_threads[i], NULL);
 	}
-
 }
 

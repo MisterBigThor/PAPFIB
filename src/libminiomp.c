@@ -34,14 +34,13 @@ void init_miniomp(void) {
 
 	// Initialize OpenMP workdescriptors for for and single
 	initSingle();
-
-	miniomp_loop.inicialized = false;	 		//initialize the loop descriptor with a null value.
+	initLoop();
 	// Initialize OpenMP task queue for task and taskloop
 }
 
 void updateNumThreads(int numThreads){
 	#if _DEBUG
-		printf("Refresh the num_threads with %i, for the default barrier.\n", numThreads);
+		printf("LIB: Refresh the num_threads with %i, for the default barrier.\n", numThreads);
 	#endif
 	miniomp_icv.nthreads_var = numThreads;
 	pthread_barrier_init(&miniomp_barrier, NULL, numThreads);
@@ -59,8 +58,10 @@ void fini_miniomp(void) {
 	destroyMap();
 
 	destroySingle();
+	clearLoop();
+
 	#if _DEBUG
-		printf ("mini-omp is finalized\n");
+		printf ("LIB: mini-omp is finalized\n");
 	#endif
 }
 

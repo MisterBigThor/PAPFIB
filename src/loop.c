@@ -1,92 +1,109 @@
 #include "libminiomp.h"
+#include <errno.h>
 
+miniomp_loop_t *miniomp_loop;
+void initDescriptor(long start, long end, long incr, long chunk_size);
+bool allocateIterations(long *istart, long *iend);
 
-miniomp_loop_t miniomp_loop;
-
-void initLoop(void){
-	pthread_mutex_init(&miniomp_loop.mutexMyChunks, NULL);
-	pthread_barrier_init(&miniomp_loop.barrier, NULL, miniomp_loop.teamThreads);
-}
-void clearLoop(void){
-	pthread_mutex_destroy(&miniomp_loop.mutexMyChunks);
-	pthread_barrier_destroy(&miniomp_loop.barrier);
-}
-
-bool GOMP_loop_dynamic_next (long *istart, long *iend) {
-	#if _DEBUG
-		printf("(%u)LOOP: more iterations\n?", omp_get_thread_num());
-	#endif
-	//fill new iterations? return if still more it's.
-//	*istart = NULL;
-//	*iend = NULL;
-	return(false);
-}
-
-/* The *_start routines are called when first encountering a loop construct
-   that is not bound directly to a parallel construct.  The first thread
-   that arrives will create the work-share construct; subsequent threads
-   will see the construct exists and allocate work from it.
-
-   START, END, INCR are the bounds of the loop; CHUNK_SIZE is the
-   scheduling parameter.
-
-   Returns true if there's any work for this thread to perform.  If so,
-   *ISTART and *IEND are filled with the bounds of the iteration block
-   allocated to this thread.  Returns false if all work was assigned to
-   other threads prior to this thread's arrival.  */
-
-bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend)
-{
-	if(__sync_bool_compare_and_swap(&miniomp_loop.inicialized, false, true)){
-		lock(miniomp_loop.mutexMyChunks)
-
-		miniomp_loop.start = start;
-		miniomp_loop.end = end;
-		miniomp_loop.incr = incr;
-		miniomp_loop.chunk_size = chunk_size;
-		miniomp_loop.schedule = ws_DYNAMIC;
-		miniomp_loop.teamThreads = omp_get_num_threads();
-
-		int l = (end-start)/chunk_size;
-		int r = (end-start)%chunk_size;
-		if(r != 0) l++;
-		miniomp_loop.myChunks[l];
-		for(int i = 1; i < l; ++i) miniomp_loop.myChunks[i] = false;
-		miniomp_loop.myChunks[0] = true;
-
-		unlock(miniomp_loop.mutexMyChunks)
-		*istart = miniomp_loop.start;
-		*iend = *istart + miniomp_loop.chunk_size;
-		return true;
+bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend){
+	if(miniomp_loop->inicialized) return allocateIterations(istart, iend);
+	int tl;
+	while((tl = pthread_mutex_trylock(&miniomp_loop->mutexMyChunks))==EBUSY){}
+	if((tl == 0) & (!miniomp_loop->inicialized)){
+		#if _DEBUG
+		printf("(%u)LOOP: inicializando el descriptor de loop.\n", ID);
+		#endif
+		initDescriptor(start, end, incr, chunk_size);
+		unlock(miniomp_loop->mutexMyChunks)
+		bool ret = allocateIterations(istart, iend);
+		return ret;
 	}
-	lock(miniomp_loop.mutexMyChunks)
-
-	unlock(miniomp_loop.mutexMyChunks)
+	if((tl == 0) & (miniomp_loop->inicialized)){
+		#if _DEBUG
+		printf("(%u)LOOP: ya esta inicializado\n", ID);
+		#endif
+		unlock(miniomp_loop->mutexMyChunks)
+		return allocateIterations(istart,iend);
+	}
+	printf("(%u)PROBLEMAS!", ID);
 	return false;
-/*	
-	bool ret = true;
-	lock(miniomp_loop.mutexNextIt)
-		*istart = miniomp_loop.nextIt;
-		*iend = miniomp_loop.nextIt + miniomp_loop.chunk_size;
-		long todo = miniomp_loop.end - miniomp_loop.nextIt;
-		if(todo < 0) ret = false;
-		else miniomp_loop.nextIt += miniomp_loop.chunk_size;
-	unlock(miniomp_loop.mutexItDone)
-	return ret;*/
 }
 
 void GOMP_loop_end (void) {
 	#if _DEBUG
-		printf("(%u)LOOP: loop_end -> waiting for the rest:\n", omp_get_thread_num());
+		printf("(%u)LOOP: loop end\n", ID);
 	#endif
-	pthread_barrier_wait(&miniomp_loop.barrier);
+	pthread_barrier_wait(&miniomp_loop->barrier);
 }
 
 void GOMP_loop_end_nowait (void) {
 	#if _DEBUG
-		printf("(%u)LOOP: loop_end_nowait\n", omp_get_thread_num());
+		printf("(%u)LOOP: nowait end\n", ID);
 	#endif
 	return;
+}
+
+void initLoop(void){
+	printf("LOOP: init data & structures\n");
+	miniomp_loop = malloc(sizeof(miniomp_loop_t));
+	miniomp_loop->inicialized = false;
+	pthread_mutex_init(&miniomp_loop->mutexMyChunks, NULL);
+	pthread_barrier_init(&miniomp_loop->barrier, NULL, 1);
+}
+void clearLoop(void){
+	printf("LOOP: clear data & structures\n");
+	pthread_mutex_destroy(&miniomp_loop->mutexMyChunks);
+	pthread_barrier_destroy(&miniomp_loop->barrier);
+	free(miniomp_loop);
+}
+
+bool GOMP_loop_dynamic_next (long *istart, long *iend) {
+	#if _DEBUG
+		printf("(%u)LOOP: dynamic Next\n", omp_get_thread_num());
+	#endif
+	return allocateIterations(istart, iend);
+}
+
+void initDescriptor(long start, long end, long incr, long chunk_size){
+		miniomp_loop->inicialized = true;
+		int l = (end-start)/chunk_size;
+		int r = (end-start)%chunk_size;
+		if(r != 0) l++;
+		printf("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
+		miniomp_loop->sizeMyChunks = l;
+		miniomp_loop->myChunks = malloc (sizeof(bool)*l);
+
+		miniomp_loop->start = start;
+		miniomp_loop->end = end;
+		miniomp_loop->incr = incr;
+		miniomp_loop->chunk_size = chunk_size;
+		miniomp_loop->schedule = ws_DYNAMIC;
+		miniomp_loop->teamThreads = omp_get_num_threads();
+		pthread_barrier_init(&miniomp_loop->barrier, NULL, miniomp_loop->teamThreads);
+		for(int i = 0; i < l; ++i) miniomp_loop->myChunks[i] = false;
+}
+bool allocateIterations(long *istart, long *iend){
+	lock(miniomp_loop->mutexMyChunks)
+	if(!miniomp_loop->inicialized) printf("PANIC!\n");
+	int i = 0;
+	while(i < miniomp_loop->sizeMyChunks){
+		if(!miniomp_loop->myChunks[i]){
+			*istart = miniomp_loop->start + (i*miniomp_loop->chunk_size);
+			*iend = *istart+miniomp_loop->chunk_size;
+			miniomp_loop->myChunks[i] = true;
+			#if _DEBUG
+			printf("(%u)LOOP: assigned [%li, %li]\n",ID, *istart, *iend);
+			#endif
+			unlock(miniomp_loop->mutexMyChunks)
+			return true;
+		}
+		++i;
+	}
+	#if _DEBUG
+		printf("(%u)No more iterations left\n", ID);
+	#endif
+	unlock(miniomp_loop->mutexMyChunks)
+	return false;
 }
 
 #if 0
@@ -110,11 +127,4 @@ GOMP_parallel_loop_dynamic (void (*fn) (void *), void *data,
   GOMP_parallel (fn, data, num_threads, flags);
 }
 
-
-void initLoop(void){
-
-}
-void clearLoop(void){
-
-}
 #endif

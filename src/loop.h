@@ -14,8 +14,8 @@ typedef struct {
 	pthread_barrier_t barrier;
 
 	pthread_mutex_t mutexMyChunks; //data race over myChunks;
-	bool myChunks[];
-
+	bool *myChunks;
+	int sizeMyChunks;
 } miniomp_loop_t;
 
 #define ws_STATIC 	0
@@ -25,7 +25,7 @@ typedef struct {
 #define ws_RUNTIME 	4
 #define ws_AUTO 	5
 
-extern miniomp_loop_t miniomp_loop;
+extern miniomp_loop_t * miniomp_loop;
 
 void initLoop(void);
 void clearLoop(void);
