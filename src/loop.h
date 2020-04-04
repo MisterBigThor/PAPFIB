@@ -3,15 +3,17 @@
 
 #include <list.h>
 
-
 typedef struct {
-	int initLoops;
+	int initLoops; //actual size of loopList
+	int actualLoop;
 	int reached[MAX_THREADS];
+	int ended[MAX_THREADS];
 	pthread_mutex_t mutexLoop;
 	struct list_head loopList;
 }miniomp_loop;
 
 struct loopDescr {
+	int id;
 	long start;
 	long end;
 	long incr;
@@ -29,7 +31,6 @@ struct loopDescr {
 	struct list_head anchor;
 };
 
-#define UNDEFINED 	-1
 #define ws_STATIC 	0
 #define ws_STATICCHUNK 	1
 #define ws_DYNAMIC 	2
