@@ -10,47 +10,57 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 	int tl;
 	while((tl = pthread_mutex_trylock(&miniomp_loop->mutexMyChunks))==EBUSY){}
 	if((tl == 0) & (!miniomp_loop->inicialized)){
-		LOG("(%u)LOOP: inicializando el descriptor de loop.\n", ID);
+		#if _DEBUG
+		printf("(%u)LOOP: inicializando el descriptor de loop.\n", ID);
+		#endif
 		initDescriptor(start, end, incr, chunk_size);
 		unlock(miniomp_loop->mutexMyChunks)
 		bool ret = allocateIterations(istart, iend);
 		return ret;
 	}
 	if((tl == 0) & (miniomp_loop->inicialized)){
-		LOG("(%u)LOOP: ya esta inicializado\n", ID);
+		#if _DEBUG
+		printf("(%u)LOOP: ya esta inicializado\n", ID);
+		#endif
 		unlock(miniomp_loop->mutexMyChunks)
 		return allocateIterations(istart,iend);
 	}
-	LOG("(%u)PROBLEMAS!", ID);
+	printf("(%u)PROBLEMAS!", ID);
 	return false;
 }
 
 void GOMP_loop_end (void) {
-	LOG("(%u)LOOP: loop end\n", ID);
+	#if _DEBUG
+		printf("(%u)LOOP: loop end\n", ID);
+	#endif
 	pthread_barrier_wait(&miniomp_loop->barrier);
 }
 
 void GOMP_loop_end_nowait (void) {
-	LOG("(%u)LOOP: nowait end\n", ID);
+	#if _DEBUG
+		printf("(%u)LOOP: nowait end\n", ID);
+	#endif
 	return;
 }
 
 void initLoop(void){
-	LOG("LOOP: init data & structures\n");
+	printf("LOOP: init data & structures\n");
 	miniomp_loop = malloc(sizeof(miniomp_loop_t));
 	miniomp_loop->inicialized = false;
 	pthread_mutex_init(&miniomp_loop->mutexMyChunks, NULL);
 	pthread_barrier_init(&miniomp_loop->barrier, NULL, 1);
 }
 void clearLoop(void){
-	LOG("LOOP: clear data & structures\n");
+	printf("LOOP: clear data & structures\n");
 	pthread_mutex_destroy(&miniomp_loop->mutexMyChunks);
 	pthread_barrier_destroy(&miniomp_loop->barrier);
 	free(miniomp_loop);
 }
 
 bool GOMP_loop_dynamic_next (long *istart, long *iend) {
-	LOG("(%u)LOOP: dynamic Next\n", omp_get_thread_num());
+	#if _DEBUG
+		printf("(%u)LOOP: dynamic Next\n", omp_get_thread_num());
+	#endif
 	return allocateIterations(istart, iend);
 }
 
@@ -59,7 +69,7 @@ void initDescriptor(long start, long end, long incr, long chunk_size){
 		int l = (end-start)/chunk_size;
 		int r = (end-start)%chunk_size;
 		if(r != 0) l++;
-		LOG("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
+		printf("(%u)LOOP: init descriptor for %i chunks\n",ID, l);
 		miniomp_loop->sizeMyChunks = l;
 		miniomp_loop->myChunks = malloc (sizeof(bool)*l);
 
@@ -74,20 +84,24 @@ void initDescriptor(long start, long end, long incr, long chunk_size){
 }
 bool allocateIterations(long *istart, long *iend){
 	lock(miniomp_loop->mutexMyChunks)
-	if(!miniomp_loop->inicialized) LOG("PANIC NO DESCRIPTOR SET!\n");
+	if(!miniomp_loop->inicialized) printf("PANIC!\n");
 	int i = 0;
 	while(i < miniomp_loop->sizeMyChunks){
 		if(!miniomp_loop->myChunks[i]){
 			*istart = miniomp_loop->start + (i*miniomp_loop->chunk_size);
 			*iend = *istart+miniomp_loop->chunk_size;
 			miniomp_loop->myChunks[i] = true;
-			LOG("(%u)LOOP: assigned [%li, %li]\n",ID, *istart, *iend);
+			#if _DEBUG
+			printf("(%u)LOOP: assigned [%li, %li]\n",ID, *istart, *iend);
+			#endif
 			unlock(miniomp_loop->mutexMyChunks)
 			return true;
 		}
 		++i;
 	}
-	LOG("(%u)No more iterations left\n", ID);
+	#if _DEBUG
+		printf("(%u)No more iterations left\n", ID);
+	#endif
 	unlock(miniomp_loop->mutexMyChunks)
 	return false;
 }
