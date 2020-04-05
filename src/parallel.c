@@ -11,6 +11,9 @@ pthread_t *miniomp_threads;
 miniomp_parallel_t *miniomp_parallel;
 pthread_key_t miniomp_specifickey;
 
+
+//cond vars?
+
 void *worker(void *args) {
 	miniomp_parallel_t *aux = args;
 	pthread_setspecific(miniomp_specifickey, (void *)aux);

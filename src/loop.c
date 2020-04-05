@@ -3,10 +3,6 @@
 
 miniomp_loop ctrlLoops;
 
-struct loopDescr * initDescriptor(long start, long end, long incr, long chunk_size);
-bool allocateIterations(struct loopDescr * miniomp_loop, long *istart, long *iend);
-struct loopDescr * getNdescriptor(int n);
-
 bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend){
 	LOG("(%u)LOOP: Dynamic start\n", ID);
 	lock(ctrlLoops.mutexLoop);

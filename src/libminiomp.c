@@ -10,8 +10,6 @@ void parse_env(void);
 
 void init_miniomp(void) {
 	LOG ("mini-omp is being initialized\n");
-
-	// Parse OMP_NUM_THREADS environment variable to initialize nthreads_var internal control variable
 	parse_env();
 
 	miniomp_threads = malloc(MAX_THREADS * sizeof(pthread_t));
@@ -22,11 +20,9 @@ void init_miniomp(void) {
 	miniomp_main->id = 0;
 	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
 
-	// Initialize OpenMP default lock and default barrier
 	initSync();
 	initMap();
 
-	// Initialize OpenMP workdescriptors for for and single
 	initSingle();
 	initLoop();
 	// Initialize OpenMP task queue for task and taskloop
@@ -40,11 +36,8 @@ void updateNumThreads(int numThreads){
 }
 
 void fini_miniomp(void) {
-	// delete Pthread thread-specific data
 	pthread_key_delete(miniomp_specifickey);
 
-	// free other data structures allocated during library initialization
-	
 	destroyMap();
 	clearSync();
 	destroySingle();

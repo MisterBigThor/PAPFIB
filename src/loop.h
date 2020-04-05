@@ -39,6 +39,9 @@ struct loopDescr {
 #define ws_AUTO 	5
 
 
+struct loopDescr * initDescriptor(long start, long end, long incr, long chunk_size);
+bool allocateIterations(struct loopDescr * miniomp_loop, long *istart, long *iend);
+struct loopDescr * getNdescriptor(int n);
 
 void initLoop(void);
 void clearLoop(void);
