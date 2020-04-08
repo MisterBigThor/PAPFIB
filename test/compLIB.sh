@@ -1,4 +1,5 @@
 #! /bin/bash
 
 cd ../src/
-make 
+echo "compiling LIB with debug option"
+make
