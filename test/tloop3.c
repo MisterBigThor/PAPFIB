@@ -15,19 +15,28 @@ void foo() {
     	{
     		#pragma omp for schedule(dynamic,4)
 	    	for (long i = 0; i < 10; i++){
-			for(long j = 0; j <10; j++)matrix[i][j] = i+j;
+			#pragma omp atomic
+			result += 5;
 		}
 
     		#pragma omp single
-    		printf("Inside foo ... result = %ld\n", result);
+    		printf("First result = %ld\n", result);
 
-		#pragma omp for schedule(dynamic,4)
-	    	for (long i = 0; i < 10; i++){
-			for(long j = 0; j < 10; j++){
-				printf("[%li][%li]: %i ", i, j, matrix[i][j]+1);
-			}
-			printf("\n");
+		#pragma omp for schedule(dynamic,40)
+	    	for (long i = 0; i <= 1000; i++){
+			#pragma omp atomic			
+			result += 3;
 		}
+    		#pragma omp single
+    		printf("Second result = %ld\n", result);
+
+		#pragma omp for schedule(dynamic,24)
+	    	for (long i = 5; i <= 100; i=i+2){
+			#pragma omp atomic
+			result += 3;
+		}
+    		#pragma omp single
+    		printf("Last result = %ld, expect 3197\n", result);
 	}
 }
 

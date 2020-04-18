@@ -13,9 +13,7 @@ pthread_key_t miniomp_specifickey;
 
 void initParallel(void){
 	pthread_mutex_init(&parallelMutex, NULL);
-	for(int i = 0; i < MAX_THREADS; ++i) {
-		threadsStatus[i].status = UNUSED;
-	}
+	for(int i = 0; i < MAX_THREADS; ++i) threadsStatus[i] = UNUSED;
 }
 
 void *worker(void *args) {
@@ -32,11 +30,12 @@ void *worker(void *args) {
 //MAX IS MAX_THREADS -> if thread id -1 create
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
 	lock(parallelMutex)
+	if(num_threads == 0) num_threads = omp_get_num_threads();
+	updateNumThreads(num_threads);
 
 	int nestedLevel = omp_get_level();
-	if(!num_threads) num_threads = omp_get_num_threads();
-	else updateNumThreads(num_threads);
 	LOG("PARALLEL: creating %d threads to %i in %i\n", num_threads, ID, nestedLevel+1);
+
 	while(num_threads > (MAX_THREADS - miniomp_icv.threads_in_use));
 
 	miniomp_parallel_t * aux = pthread_getspecific(miniomp_specifickey);
@@ -44,12 +43,9 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	for(int i = 0; i<MAX_THREADS; ++i) w[i] = -1;
 
 	int leaderThread = -1;
-	int id = 0;
-	int i =0;
-	int asigned = 0;
+	int id = 0; int i =0; int asigned = 0;
 	while((i < MAX_THREADS) & (asigned < num_threads)){
-		if(threadsStatus[i].status == UNUSED){
-			LOG("Using thread %i\n", i);
+		if(threadsStatus[i] == UNUSED){
 			if(leaderThread == -1){
 				pthread_barrier_init(&miniomp_parallel[i].barrier,NULL, num_threads);
 				leaderThread = i;
@@ -61,7 +57,7 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 			miniomp_parallel[i].nestedLevel = nestedLevel+1;
 			miniomp_parallel[i].teamBarrier = &(miniomp_parallel[leaderThread].barrier);
 			pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
-			threadsStatus[i].status = USED;
+			threadsStatus[i] = USED;
 			w[i] = 1;
 			asigned++;
 		}
@@ -73,8 +69,7 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	for(int i = 0; i < MAX_THREADS; i++){
 		if(w[i] == 1){
 			pthread_join(miniomp_threads[i], NULL);
-			LOG("joining %i\n", i);
-			threadsStatus[i].status = UNUSED;
+			threadsStatus[i] = UNUSED;
 			miniomp_icv.threads_in_use--;
 		}
 	}

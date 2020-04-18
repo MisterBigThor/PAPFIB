@@ -11,20 +11,16 @@ extern pthread_t *miniomp_threads;
 
 pthread_mutex_t parallelMutex;
 
-struct threadStatus{
-	int status;
-};
-
-struct threadStatus threadsStatus[MAX_THREADS];
+int threadsStatus[MAX_THREADS];
 
 typedef struct {
 	void (*fn) (void *);
 	void *fn_data;
 
-	int id;
-	int nestedLevel;
+	int id;			//id inside the nested level
+	int nestedLevel;	//nested level of the thread
 
-	int num_threads; //threads defined in this 
+	int num_threads; 	//threads defined in the region. For thread master 
 
 	int barrierThread;
 	pthread_barrier_t barrier;
@@ -42,4 +38,5 @@ extern pthread_key_t miniomp_internalkey;
 
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags);
 void initParallel(void);
+
 #endif

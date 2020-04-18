@@ -4,7 +4,7 @@
 miniomp_loop ctrlLoops;
 
 bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, long *istart, long *iend){
-	LOG("(%u)LOOP: Dynamic start\n", ID);
+//	LOG("(%u)LOOP: Dynamic start\n", ID);
 	lock(ctrlLoops.mutexLoop);
 	ctrlLoops.reached[ID]++;
 	if(ctrlLoops.reached[ID] > ctrlLoops.actualLoop){
@@ -17,7 +17,7 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 }
 
 void GOMP_loop_end (void) {
-	LOG("(%u)LOOP: loop end\n", ID);
+//	LOG("(%u)LOOP: loop end\n", ID);
 	ctrlLoops.ended[ID]++;
 	struct loopDescr * miniomp_loop = getNdescriptor(ctrlLoops.ended[ID]-1);
 	pthread_barrier_wait(&miniomp_loop->barrier);
@@ -25,7 +25,7 @@ void GOMP_loop_end (void) {
 }
 
 void GOMP_loop_end_nowait (void) {
-	LOG("(%u)LOOP: nowait end\n", ID);
+//	LOG("(%u)LOOP: nowait end\n", ID);
 	ctrlLoops.ended[ID]++;
 	return;
 }
@@ -59,8 +59,8 @@ void clearLoop(void){
 
 struct loopDescr * initDescriptor(long start, long end, long incr, long chunk_size){
 	struct loopDescr * miniomp_loop = malloc(sizeof(struct loopDescr));
-	int l = (end-start)/chunk_size + (end-start)%chunk_size;
-
+	int l = (end-start)/chunk_size ;
+	if ((end-start)%chunk_size != 0) l++;
 	miniomp_loop->myChunks = malloc(sizeof(bool)*l);
 	miniomp_loop->sizeMyChunks = l;
 	for(int i = 0; i< l; ++i) miniomp_loop->myChunks[i]=false;
@@ -85,7 +85,8 @@ bool allocateIterations(struct loopDescr * miniomp_loop, long *istart, long *ien
 	while(i < miniomp_loop->sizeMyChunks){
 		if(!miniomp_loop->myChunks[i]){
 			*istart = miniomp_loop->start + (i*miniomp_loop->chunk_size);
-			*iend = *istart+miniomp_loop->chunk_size;
+			if(*istart+(miniomp_loop->chunk_size) >	miniomp_loop->end) *iend = miniomp_loop->end;
+			else *iend = *istart+(miniomp_loop->chunk_size);
 			miniomp_loop->myChunks[i] = true;
 			LOG("(%u)LOOP: assigned [%li, %li]\n",ID, *istart, *iend);
 			unlock(miniomp_loop->mutex)

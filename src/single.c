@@ -5,7 +5,6 @@
 miniomp_single_t miniomp_single;
 
 bool GOMP_single_start (void){
-	printf("hello single\n");
 	miniomp_single.singles[ID]++;
 	int max = miniomp_single.max;
 	if(miniomp_single.singles[ID] > max){

@@ -28,8 +28,10 @@ int eratosthenes(int lastNumber)
 	#pragma omp parallel 
 	{	
 		#pragma omp for schedule (dynamic, CHUNK)
-		for (int i = 0; i <= lastNumber; i++) isPrime[i] = 1;
-
+		for (int i = 0; i <= lastNumber; i++) {
+			printf("");
+			isPrime[i] = 1;
+		}
 		#pragma omp single
 		printf("End first loop\n");
 

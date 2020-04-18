@@ -7,6 +7,7 @@ void fini_miniomp(void) __attribute__((destructor));
 
 // Function to parse OMP_NUM_THREADS environment variable
 void parse_env(void);
+void creatThreadMaster(void);
 
 void init_miniomp(void) {
 	LOG ("mini-omp is being initialized\n");
@@ -17,13 +18,7 @@ void init_miniomp(void) {
 
 	pthread_key_create(&miniomp_specifickey, NULL);
 
-	miniomp_parallel_t * miniomp_main = (miniomp_parallel_t *) malloc(sizeof(miniomp_parallel_t));
-	miniomp_main->id = -1;
-	miniomp_main->nestedLevel = 0;
-	miniomp_main->num_threads = miniomp_icv.nthreads_var;
-
-	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=-1
-
+	creatThreadMaster();
 	initParallel();
 	initSync();
 	initMap();
@@ -32,7 +27,15 @@ void init_miniomp(void) {
 }
 
 
+void creatThreadMaster(void){
+	miniomp_parallel_t * miniomp_main = (miniomp_parallel_t *) malloc(sizeof(miniomp_parallel_t));
+	miniomp_main->id = -1;
+	miniomp_main->nestedLevel = 0;
+	miniomp_main->num_threads = miniomp_icv.nthreads_var;
 
+	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=-1
+
+}
 void fini_miniomp(void) {
 	pthread_key_delete(miniomp_specifickey);
 
