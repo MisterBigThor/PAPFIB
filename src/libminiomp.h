@@ -39,7 +39,7 @@
 #include "map.h"
 #include "list.h"
 
-void updateNumThreads(int numThreads);
+extern void updateNumThreads(int numThreads);
 
 
 

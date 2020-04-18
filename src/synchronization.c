@@ -13,6 +13,12 @@ void initSync(void){
 	pthread_mutex_init(&miniomp_default_lock, NULL);
 }
 
+void updateNumThreads(int numThreads){
+	LOG("SYNC: Refresh the num_threads with %i, for the default barrier.\n", numThreads);
+	pthread_barrier_init(&miniomp_barrier, NULL, numThreads);
+	return;
+}
+
 void clearSync(void){
 	pthread_mutex_destroy(&miniomp_default_lock);
 	pthread_barrier_destroy(&miniomp_barrier); // free default barrier

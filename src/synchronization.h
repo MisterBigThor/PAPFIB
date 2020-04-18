@@ -10,6 +10,7 @@ extern pthread_mutex_t miniomp_default_lock;
 extern pthread_barrier_t miniomp_barrier;
 
 void initSync(void);
+void updateNumThreads(int numThreads);
 void clearSync(void);
 
 // Functions implemented in this module

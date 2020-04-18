@@ -106,7 +106,7 @@ struct loopDescr * getNdescriptor(int n){
 		n--;
 	}
 	struct loopDescr * ret = list_entry(list,struct loopDescr,anchor);
-	LOG("LOOP:Select %i\n", ret->id);
+	//LOG("LOOP:Select %i\n", ret->id);
 	return ret;
 }
 
@@ -121,7 +121,6 @@ struct loopDescr * getNdescriptor(int n){
 
 
 
-#if 0
 // Only implement this if really needed, i.e. you find a case in which it is invoked
 
 /* The GOMP_parallel_loop_* routines pre-initialize a work-share construct
@@ -142,4 +141,4 @@ GOMP_parallel_loop_dynamic (void (*fn) (void *), void *data,
   GOMP_parallel (fn, data, num_threads, flags);
 }
 
-#endif
+

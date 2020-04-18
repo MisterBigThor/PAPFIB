@@ -13,7 +13,9 @@ pthread_key_t miniomp_specifickey;
 
 void initParallel(void){
 	pthread_mutex_init(&parallelMutex, NULL);
-	for(int i = 0; i < MAX_THREADS; ++i) threadsStatus[i].status = UNUSED;
+	for(int i = 0; i < MAX_THREADS; ++i) {
+		threadsStatus[i].status = UNUSED;
+	}
 }
 
 void *worker(void *args) {
@@ -22,7 +24,6 @@ void *worker(void *args) {
 	miniomp_parallel_t * aaa = pthread_getspecific(miniomp_specifickey);
 
 	aaa->fn(aaa->fn_data);
-//	printf("(%d)PARALLEL: wait for the team threads\n", ID);
 	pthread_barrier_wait(aux->teamBarrier);
 
 	pthread_exit(NULL);
@@ -36,10 +37,11 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	if(!num_threads) num_threads = omp_get_num_threads();
 	else updateNumThreads(num_threads);
 	LOG("PARALLEL: creating %d threads to %i in %i\n", num_threads, ID, nestedLevel+1);
-	while(num_threads > (MAX_THREADS - miniomp_icv.threads_in_use)){
-//		printf("waiting");
-	}
-	LOG("PARALLEL: actual nestedLevel: %d\n", miniomp_icv.nested_level);
+	while(num_threads > (MAX_THREADS - miniomp_icv.threads_in_use));
+
+	miniomp_parallel_t * aux = pthread_getspecific(miniomp_specifickey);
+	int * w = aux->wait;
+	for(int i = 0; i<MAX_THREADS; ++i) w[i] = -1;
 
 	int leaderThread = -1;
 	int id = 0;
@@ -53,28 +55,29 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 				leaderThread = i;
 			}
 			miniomp_parallel[i].id = id++;
-			miniomp_parallel[i].teamThreads = num_threads;
+			miniomp_parallel[i].num_threads = num_threads;
 			miniomp_parallel[i].fn_data = data;
 			miniomp_parallel[i].fn = fn;
 			miniomp_parallel[i].nestedLevel = nestedLevel+1;
 			miniomp_parallel[i].teamBarrier = &(miniomp_parallel[leaderThread].barrier);
 			pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 			threadsStatus[i].status = USED;
+			w[i] = 1;
 			asigned++;
 		}
 		++i;
 	}
 	miniomp_icv.threads_in_use += num_threads;
 	unlock(parallelMutex)
+	
 	for(int i = 0; i < MAX_THREADS; i++){
-		if(threadsStatus[i].status != UNUSED){
+		if(w[i] == 1){
 			pthread_join(miniomp_threads[i], NULL);
 			LOG("joining %i\n", i);
 			threadsStatus[i].status = UNUSED;
 			miniomp_icv.threads_in_use--;
 		}
 	}
-	miniomp_icv.nested_level--;
-	LOG("end parallel\n");
+	LOG("%i end parallel\n", ID);
 }
 

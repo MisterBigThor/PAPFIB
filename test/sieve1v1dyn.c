@@ -15,7 +15,7 @@ double getusec_() {
 #define START_COUNT_TIME stamp = getusec_();
 #define STOP_COUNT_TIME stamp = getusec_() - stamp;\
                         stamp = stamp/1e6;
-#define CHUNK 1000
+#define CHUNK 10
 
 // simple serial sieve of Eratosthenes
 
@@ -23,22 +23,30 @@ int eratosthenes(int lastNumber)
 {
 	int found = 0;
 	int sqrt_lN = sqrt(lastNumber);
+	int * isPrime = (int *) malloc((lastNumber+1) * sizeof(int));
+	printf("%d\n", lastNumber);
+	#pragma omp parallel 
+	{	
+		#pragma omp for schedule (dynamic, CHUNK)
+		for (int i = 0; i <= lastNumber; i++) isPrime[i] = 1;
 
-	char * isPrime = (char *) malloc((lastNumber+1) * sizeof(char));
-	#pragma omp parallel for schedule (dynamic, CHUNK)
-	for (int i = 0; i <= lastNumber; i++) isPrime[i] = 1;
+		#pragma omp single
+		printf("End first loop\n");
 
 
-	for (int i = 2; i <= sqrt_lN; i++)
-		if (isPrime[i])
-			#pragma omp parallel for schedule(dynamic, CHUNK)
-			for (int j = i*i; j <= lastNumber; j += i) isPrime[j] = 0;
+		for (int i = 2; i <= sqrt_lN; i++)
+			if (isPrime[i])
+				#pragma omp for schedule(dynamic, CHUNK)
+				for (int j = i*i; j <= lastNumber; j += i) isPrime[j] = 0;
+		#pragma omp single
+		printf("End second loop\n");
 
-	//it dependents
-	#pragma omp parallel for reduction(+:found) schedule(dynamic, CHUNK)
-	for (int i = 2; i <= lastNumber; i++)
-		found += isPrime[i];
 
+		#pragma omp for reduction(+:found) schedule(dynamic, CHUNK)
+		for (int i = 2; i <= lastNumber; i++)
+			found += isPrime[i];
+		printf("End third loop\n");
+	}
 	free(isPrime);
 	return found;
 }

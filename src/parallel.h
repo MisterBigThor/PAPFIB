@@ -23,17 +23,14 @@ typedef struct {
 
 	int id;
 	int nestedLevel;
-	int teamThreads;
 
-	int num_threads;
+	int num_threads; //threads defined in this 
 
 	int barrierThread;
 	pthread_barrier_t barrier;
 	pthread_barrier_t *teamBarrier;
 
-	//Sync stuff:
-	pthread_mutex_t miniomp_default_lock;
-	pthread_barrier_t miniomp_barrier;
+	int wait[MAX_THREADS];
 
 } miniomp_parallel_t;
 

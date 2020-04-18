@@ -17,5 +17,5 @@ int main(int argc, char *argv[]) {
 	{
 		printf("Second single Only one thread here, I'm %u!\n.", omp_get_thread_num());
 	}
-	printf("%u: end\n", omp_get_thread_num());
+	printf("%i: end\n", omp_get_thread_num());
 }
