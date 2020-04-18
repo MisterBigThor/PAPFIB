@@ -11,6 +11,7 @@ typedef struct {
 	void (*fn) (void *);
 	void *fn_data;
 	int id;
+	int nestedLevel;
 	int used;
 } miniomp_parallel_t;
 

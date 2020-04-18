@@ -14,8 +14,9 @@ void init_miniomp(void) {
 
 	miniomp_threads = malloc(MAX_THREADS * sizeof(pthread_t));
 	miniomp_parallel = malloc(MAX_THREADS * sizeof(miniomp_parallel_t));
-
+	miniomp_icv.nested_level = 0;
 	pthread_key_create(&miniomp_specifickey, NULL);
+
 	miniomp_parallel_t * miniomp_main = (miniomp_parallel_t *) malloc(sizeof(miniomp_parallel_t));
 	miniomp_main->id = 0;
 	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
