@@ -9,11 +9,7 @@
 #include <stdint.h>
 #include <pthread.h>
 
-// Maximum number of threads to be supported by our implementation
-// To be used whenever you need to dimension thread-related structures
 #define MAX_THREADS 32
-// Debug for the internal printf
-//#define _DEBUG 0
 
 // Some defines:
 #define lock(t) pthread_mutex_lock(&t);
@@ -23,11 +19,6 @@
 #define ID omp_get_thread_num()
 #define TEAM omp_get_num_threads()
 
-/*
-#if _DEBUG
-
-#endif
-*/
 #ifdef _DEBUG
 #define LOG printf
 #else
