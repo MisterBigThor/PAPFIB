@@ -15,12 +15,18 @@ void init_miniomp(void) {
 	miniomp_threads = malloc(MAX_THREADS * sizeof(pthread_t));
 	miniomp_parallel = malloc(MAX_THREADS * sizeof(miniomp_parallel_t));
 	miniomp_icv.nested_level = 0;
+
 	pthread_key_create(&miniomp_specifickey, NULL);
 
 	miniomp_parallel_t * miniomp_main = (miniomp_parallel_t *) malloc(sizeof(miniomp_parallel_t));
-	miniomp_main->id = 0;
-	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=0
+	miniomp_main->id = -1;
+	miniomp_main->nestedLevel = 0;
+	miniomp_main->num_threads = miniomp_icv.nthreads_var;
+	pthread_mutex_init(&(miniomp_main->miniomp_default_lock), NULL);
+	pthread_barrier_init(&(miniomp_main->miniomp_barrier),NULL, TEAM);
+	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=-1
 
+	initParallel();
 	initSync();
 	initMap();
 
@@ -31,7 +37,6 @@ void init_miniomp(void) {
 
 void updateNumThreads(int numThreads){
 	LOG("LIB: Refresh the num_threads with %i, for the default barrier.\n", numThreads);
-	miniomp_icv.nthreads_var = numThreads;
 	pthread_barrier_init(&miniomp_barrier, NULL, numThreads);
 	return;
 }

@@ -15,4 +15,5 @@ int omp_get_thread_num (void);
 // This function returns the nesting level for the parallel region, 
 // which enclose the calling call 
 int omp_get_level (void);
+
 #endif

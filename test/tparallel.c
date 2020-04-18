@@ -8,14 +8,14 @@ int foo() {
     int i, x = 1023;
     #pragma omp parallel firstprivate(x) reduction(+:first) if(x>0) num_threads(2)
     {
-    x++; 
-    first += x;
+	    x++; 
+	    first += x;
     }
-
+    printf("Thread finished first parallel\n");
     #pragma omp parallel firstprivate(x) reduction(+:first) if(0)
     {
-    x++; 
-    first += x;
+	    x++; 
+	    first += x;
     }
     printf("Thread finished second parallel\n");
     #pragma omp parallel private(i) shared(first) reduction(+:second) 
@@ -25,8 +25,9 @@ int foo() {
     }
     omp_set_num_threads(6);
     printf("Thread finished third parallel.\n");
+
     #pragma omp parallel
-    printf("Thread %d finished the execution of foo\n", omp_get_thread_num());
+	    printf("Thread %d finished the execution of foo\n", omp_get_thread_num());
     printf("All finished\n");
     return(x);
 }
