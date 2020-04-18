@@ -13,10 +13,8 @@ int omp_get_thread_num (void) {
 	return aux->id;
 }
 
-// No need to implement this function, it is just involked by Extrae at some point
-// and returns the current nesting for parallel regions
 int omp_get_level (void) {
-//    printf("TBI: omp_get_level ... let say current nesting level is 1\n");
-    return(1);
+	miniomp_parallel_t * aux = pthread_getspecific(miniomp_specifickey);
+   	return aux->nestedLevel;
 }
 

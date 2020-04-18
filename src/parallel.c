@@ -27,16 +27,23 @@ void *worker(void *args) {
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
 	if(!num_threads) num_threads = omp_get_num_threads();
 	else updateNumThreads(num_threads);
-	LOG("PARALLEL: starting a parallel region using %d threads\n", num_threads);
+
+	LOG("PARALLEL: starting a parallel region :%d threads\n", num_threads);
+	miniomp_icv.nested_level++;
+	LOG("PARALLEL: actual nestedLevel: %d\n", miniomp_icv.nested_level);
 
 	for (int i=0; i<num_threads; i++){
 		miniomp_parallel[i].id = i;
 		miniomp_parallel[i].fn_data = data;
 		miniomp_parallel[i].fn = fn;
+		miniomp_parallel[i].used = USED;
+		miniomp_parallel[i].nested_level = miniomp_icv.nested_level;
 		pthread_create(&miniomp_threads[i], NULL, &worker,(void *) &miniomp_parallel[i]);
 	}
 	for(int i = 0; i < num_threads; i++){
 		pthread_join(miniomp_threads[i], NULL);
 	}
+	miniomp_icv.nested_level--;
+
 }
 
