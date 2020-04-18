@@ -15,7 +15,7 @@ double getusec_() {
 #define START_COUNT_TIME stamp = getusec_();
 #define STOP_COUNT_TIME stamp = getusec_() - stamp;\
                         stamp = stamp/1e6;
-#define CHUNK 10
+#define CHUNK 10000
 
 // simple serial sieve of Eratosthenes
 
@@ -29,7 +29,6 @@ int eratosthenes(int lastNumber)
 	{	
 		#pragma omp for schedule (dynamic, CHUNK)
 		for (int i = 0; i <= lastNumber; i++) {
-			printf("");
 			isPrime[i] = 1;
 		}
 		#pragma omp single
@@ -38,15 +37,18 @@ int eratosthenes(int lastNumber)
 
 		for (int i = 2; i <= sqrt_lN; i++)
 			if (isPrime[i])
-				#pragma omp for schedule(dynamic, CHUNK)
+				#pragma omp single nowait
 				for (int j = i*i; j <= lastNumber; j += i) isPrime[j] = 0;
+
 		#pragma omp single
 		printf("End second loop\n");
 
 
-		#pragma omp for reduction(+:found) schedule(dynamic, CHUNK)
+		#pragma omp for schedule (dynamic, CHUNK)	
 		for (int i = 2; i <= lastNumber; i++)
 			found += isPrime[i];
+		
+		#pragma omp single
 		printf("End third loop\n");
 	}
 	free(isPrime);
