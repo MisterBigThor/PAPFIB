@@ -2,10 +2,11 @@
 #define PARALLEL_H
 
 #include <pthread.h>
+#define USED 1
+#define UNUSED 0
 
 extern pthread_t *miniomp_threads;
 
-// Type declaration for parallel descriptor (arguments needed to create pthreads)
 typedef struct {
 	void (*fn) (void *);
 	void *fn_data;
