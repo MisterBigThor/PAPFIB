@@ -17,7 +17,7 @@ bool GOMP_loop_dynamic_start (long start, long end, long incr, long chunk_size, 
 }
 
 void GOMP_loop_end (void) {
-	LOG("(%u)LOOP: loop end\n", ID);
+//	LOG("(%u)LOOP: loop end\n", ID);
 	ctrlLoops.ended[ID]++;
 	struct loopDescr * miniomp_loop = getNdescriptor(ctrlLoops.ended[ID]-1);
 	pthread_barrier_wait(&miniomp_loop->barrier);

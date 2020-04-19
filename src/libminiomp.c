@@ -1,11 +1,11 @@
 #include "libminiomp.h"
 #include "intrinsic.h"
 
-// Library constructor and desctructor
+
 void init_miniomp(void) __attribute__((constructor));
 void fini_miniomp(void) __attribute__((destructor));
 
-// Function to parse OMP_NUM_THREADS environment variable
+
 void parse_env(void);
 void creatThreadMaster(void);
 
@@ -32,7 +32,7 @@ void creatThreadMaster(void){
 	miniomp_main->id = -1;
 	miniomp_main->nestedLevel = 0;
 	miniomp_main->num_threads = miniomp_icv.nthreads_var;
-	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=-1
+	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); 
 
 }
 void fini_miniomp(void) {
