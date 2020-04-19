@@ -20,9 +20,8 @@ typedef struct {
 	int id;			//id inside the nested level
 	int nestedLevel;	//nested level of the thread
 
-	int num_threads; 	//threads defined in the region. For thread master 
+	int num_threads; 	//threads defined in the region.
 
-	int barrierThread;
 	pthread_barrier_t barrier;
 	pthread_barrier_t *teamBarrier;
 

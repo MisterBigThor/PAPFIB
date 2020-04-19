@@ -27,7 +27,7 @@ void *worker(void *args) {
 	pthread_exit(NULL);
 	return NULL;
 }
-//MAX IS MAX_THREADS -> if thread id -1 create
+
 void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsigned int flags) {
 	lock(parallelMutex)
 	if(num_threads == 0) num_threads = omp_get_num_threads();
@@ -65,7 +65,7 @@ void GOMP_parallel (void (*fn) (void *), void *data, unsigned num_threads, unsig
 	}
 	miniomp_icv.threads_in_use += num_threads;
 	unlock(parallelMutex)
-	
+
 	for(int i = 0; i < MAX_THREADS; i++){
 		if(w[i] == 1){
 			pthread_join(miniomp_threads[i], NULL);

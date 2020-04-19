@@ -32,7 +32,6 @@ void creatThreadMaster(void){
 	miniomp_main->id = -1;
 	miniomp_main->nestedLevel = 0;
 	miniomp_main->num_threads = miniomp_icv.nthreads_var;
-
 	pthread_setspecific(miniomp_specifickey, (void *) miniomp_main); // implicit initial pthread with id=-1
 
 }

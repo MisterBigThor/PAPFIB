@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define INIT_MUTEXES 3
+#define INIT_MUTEXES 5
 
 typedef struct {
 	void * key;

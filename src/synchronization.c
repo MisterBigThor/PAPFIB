@@ -1,7 +1,5 @@
 #include "libminiomp.h"
 
-#define MAX_NAMED_LOCKS 4
-
 /*
 File for implement the barrier and critical section (named & unnamed).
 Uses a key-value, inicialized in the lib, for contain all the names and locks.
@@ -52,7 +50,7 @@ void GOMP_critical_name_end (void **pptr) {
 pthread_barrier_t miniomp_barrier;
 
 void GOMP_barrier() {
-	//LOG("(%u)GOMP_barrier: entering barrier \n", ID);
+	LOG("(%i)GOMP_barrier: entering barrier \n", ID);
 	pthread_barrier_wait(&miniomp_barrier);
-	//LOG("(%u)GOMP_barrier: ended the barrier \n", ID);
+	LOG("(%i)GOMP_barrier: ended the barrier \n", ID);
 }

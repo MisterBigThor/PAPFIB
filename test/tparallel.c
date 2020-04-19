@@ -11,24 +11,24 @@ int foo() {
 	    x++; 
 	    first += x;
     }
-    printf("Thread finished first parallel\n");
+//    printf("Thread finished first parallel\n");
     #pragma omp parallel firstprivate(x) reduction(+:first) if(0)
     {
 	    x++; 
 	    first += x;
     }
-    printf("Thread finished second parallel\n");
+  //  printf("Thread finished second parallel\n");
     #pragma omp parallel private(i) shared(first) reduction(+:second) 
     {
 	second = first;
 	for (i = 0; i < 16; i++) second++;
     }
     omp_set_num_threads(6);
-    printf("Thread finished third parallel.\n");
+    //printf("Thread finished third parallel.\n");
 
     #pragma omp parallel
-	    printf("Thread %d finished the execution of foo\n", omp_get_thread_num());
-    printf("All finished\n");
+    printf("Thread %d finished the execution of foo\n", omp_get_thread_num());
+  //  printf("All finished\n");
     return(x);
 }
 

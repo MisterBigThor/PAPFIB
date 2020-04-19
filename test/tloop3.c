@@ -8,8 +8,6 @@
 
 long result=0;
 
-int matrix[10][10];
-
 void foo() {
 	#pragma omp parallel
     	{

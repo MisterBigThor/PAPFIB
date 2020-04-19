@@ -23,31 +23,32 @@ int eratosthenes(int lastNumber)
 {
 	int found = 0;
 	int sqrt_lN = sqrt(lastNumber);
-	int * isPrime = (int *) malloc((lastNumber+1) * sizeof(int));
-	printf("%d\n", lastNumber);
-	#pragma omp parallel 
-	{	
+	char * isPrime = (char *) malloc((lastNumber+1) * sizeof(char));
+	#pragma omp parallel
+	{
 		#pragma omp for schedule (dynamic, CHUNK)
 		for (int i = 0; i <= lastNumber; i++) {
 			isPrime[i] = 1;
 		}
+
 		#pragma omp single
 		printf("End first loop\n");
-
-
+	}
+	#pragma omp parallel
+	{
 		for (int i = 2; i <= sqrt_lN; i++)
-			if (isPrime[i])
-				#pragma omp single nowait
+			if (isPrime[i]){
+				#pragma omp for schedule(dynamic, CHUNK)
 				for (int j = i*i; j <= lastNumber; j += i) isPrime[j] = 0;
-
+			}
 		#pragma omp single
 		printf("End second loop\n");
+	}
+	#pragma omp parallel
+	{
+		#pragma omp for schedule (dynamic, CHUNK)
+		for (int i = 2; i <= lastNumber; i++) found += isPrime[i];
 
-
-		#pragma omp for schedule (dynamic, CHUNK)	
-		for (int i = 2; i <= lastNumber; i++)
-			found += isPrime[i];
-		
 		#pragma omp single
 		printf("End third loop\n");
 	}
